@@ -35,11 +35,6 @@ I've been creating dashboard UIs at work and for my personal projects. I always 
 ## Run Locally
 
 Clone the project
-
-```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
-```
-
 Go to the project directory
 
 ```bash
@@ -57,10 +52,6 @@ Start the server
 ```bash
   pnpm run dev
 ```
-
-## Author
-
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
 
 ## License
 
