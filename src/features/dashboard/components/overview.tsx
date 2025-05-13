@@ -1,53 +1,30 @@
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
+// Dados de exemplo para gastos mensais
 const data = [
   {
     name: 'Jan',
-    total: Math.floor(Math.random() * 5000) + 1000,
+    total: 1890,
   },
   {
-    name: 'Feb',
-    total: Math.floor(Math.random() * 5000) + 1000,
+    name: 'Fev',
+    total: 2350,
   },
   {
     name: 'Mar',
-    total: Math.floor(Math.random() * 5000) + 1000,
+    total: 3100,
   },
   {
-    name: 'Apr',
-    total: Math.floor(Math.random() * 5000) + 1000,
+    name: 'Abr',
+    total: 2700,
   },
   {
-    name: 'May',
-    total: Math.floor(Math.random() * 5000) + 1000,
+    name: 'Mai',
+    total: 3250,
   },
   {
     name: 'Jun',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: 'Jul',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: 'Aug',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: 'Sep',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: 'Oct',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: 'Nov',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: 'Dec',
-    total: Math.floor(Math.random() * 5000) + 1000,
+    total: 3521,
   },
 ]
 
@@ -67,7 +44,7 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `R$${value}`}
         />
         <Bar
           dataKey='total'

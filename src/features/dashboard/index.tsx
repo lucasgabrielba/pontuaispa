@@ -1,3 +1,8 @@
+/**
+ * src/features/dashboard/index.tsx - Arquivo principal da Dashboard
+ * 
+ * Este arquivo importa os componentes necessários e exporta a Dashboard completa
+ */
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -14,7 +19,10 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Overview } from './components/overview'
-import { RecentSales } from './components/recent-sales'
+import { RecentTransactions } from './components/recent-transactions'
+import { PointsStatus } from './components/points-status'
+import { RecommendationsList } from './components/recommendations-list'
+import { IconUpload, IconCreditCard, IconPointerStar } from '@tabler/icons-react'
 
 export default function Dashboard() {
   return (
@@ -34,7 +42,10 @@ export default function Dashboard() {
         <div className='mb-2 flex items-center justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
           <div className='flex items-center space-x-2'>
-            <Button>Download</Button>
+            <Button onClick={() => window.location.href="/faturas/upload"}>
+              <IconUpload className="mr-2 h-4 w-4" />
+              Enviar Fatura
+            </Button>
           </div>
         </div>
         <Tabs
@@ -44,16 +55,9 @@ export default function Dashboard() {
         >
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
-              <TabsTrigger value='overview'>Overview</TabsTrigger>
-              <TabsTrigger value='analytics' disabled>
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value='reports' disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value='notifications' disabled>
-                Notifications
-              </TabsTrigger>
+              <TabsTrigger value='overview'>Visão Geral</TabsTrigger>
+              <TabsTrigger value='points'>Pontos</TabsTrigger>
+              <TabsTrigger value='recommendations'>Recomendações</TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value='overview' className='space-y-4'>
@@ -61,7 +65,7 @@ export default function Dashboard() {
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Total Revenue
+                    Total Gasto
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -77,85 +81,51 @@ export default function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
+                  <div className='text-2xl font-bold'>R$ 3.521,89</div>
                   <p className='text-xs text-muted-foreground'>
-                    +20.1% from last month
+                    +12.5% do mês anterior
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Subscriptions
+                    Pontos Ganhos
                   </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                    <circle cx='9' cy='7' r='4' />
-                    <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                  </svg>
+                  <IconPointerStar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
+                  <div className='text-2xl font-bold'>1.258</div>
                   <p className='text-xs text-muted-foreground'>
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <rect width='20' height='14' x='2' y='5' rx='2' />
-                    <path d='M2 10h20' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
+                    Acumulados este mês
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Active Now
+                    Potencial de Pontos
                   </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                  </svg>
+                  <IconPointerStar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
+                  <div className='text-2xl font-bold'>+2.431</div>
                   <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
+                    +93% de oportunidade
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                  <CardTitle className='text-sm font-medium'>
+                    Cartões Ativos
+                  </CardTitle>
+                  <IconCreditCard className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className='text-2xl font-bold'>2</div>
+                  <p className='text-xs text-muted-foreground'>
+                    Nubank e Itaucard
                   </p>
                 </CardContent>
               </Card>
@@ -163,7 +133,7 @@ export default function Dashboard() {
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-4'>
                 <CardHeader>
-                  <CardTitle>Overview</CardTitle>
+                  <CardTitle>Visão Geral de Gastos</CardTitle>
                 </CardHeader>
                 <CardContent className='pl-2'>
                   <Overview />
@@ -171,16 +141,72 @@ export default function Dashboard() {
               </Card>
               <Card className='col-span-1 lg:col-span-3'>
                 <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>Transações Recentes</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    Seus últimos 5 gastos com cartão.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentSales />
+                  <RecentTransactions />
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          
+          <TabsContent value='points' className='space-y-4'>
+            <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+              <Card className='col-span-1'>
+                <CardHeader>
+                  <CardTitle>Status dos Pontos</CardTitle>
+                  <CardDescription>
+                    Resumo dos seus pontos por programa
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className='pl-2'>
+                  <PointsStatus />
+                </CardContent>
+              </Card>
+              <Card className='col-span-1'>
+                <CardHeader>
+                  <CardTitle>Histórico de Pontos</CardTitle>
+                  <CardDescription>
+                    Evolução dos pontos nos últimos 6 meses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 w-full flex items-center justify-center text-muted-foreground">
+                    Gráfico de histórico de pontos será exibido aqui
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className='col-span-1 lg:col-span-2'>
+                <CardHeader>
+                  <CardTitle>Onde você mais acumula pontos</CardTitle>
+                  <CardDescription>
+                    Principais estabelecimentos e categorias
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 w-full flex items-center justify-center text-muted-foreground">
+                    Detalhamento de pontos por estabelecimento/categoria será exibido aqui
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value='recommendations' className='space-y-4'>
+            <Card className='col-span-1'>
+              <CardHeader>
+                <CardTitle>Recomendações Personalizadas</CardTitle>
+                <CardDescription>
+                  Como maximizar seus pontos com base nos seus gastos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RecommendationsList />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </Main>
@@ -190,27 +216,27 @@ export default function Dashboard() {
 
 const topNav = [
   {
-    title: 'Overview',
-    href: 'dashboard/overview',
+    title: 'Dashboard',
+    href: '/',
     isActive: true,
     disabled: false,
   },
   {
-    title: 'Customers',
-    href: 'dashboard/customers',
+    title: 'Cartões',
+    href: '/cartoes',
     isActive: false,
-    disabled: true,
+    disabled: false,
   },
   {
-    title: 'Products',
-    href: 'dashboard/products',
+    title: 'Faturas',
+    href: '/faturas',
     isActive: false,
-    disabled: true,
+    disabled: false,
   },
   {
-    title: 'Settings',
-    href: 'dashboard/settings',
+    title: 'Pontos',
+    href: '/pontos',
     isActive: false,
-    disabled: true,
+    disabled: false,
   },
 ]
