@@ -1,23 +1,12 @@
 import {
-  IconBarrierBlock,
-  IconBrowserCheck,
-  IconBug,
   IconChecklist,
-  IconError404,
   IconHelp,
   IconLayoutDashboard,
-  IconLock,
-  IconLockAccess,
-  IconMessages,
   IconNotification,
   IconPackages,
   IconPalette,
-  IconServerOff,
   IconSettings,
   IconTool,
-  IconUserCog,
-  IconUserOff,
-  IconUsers,
 } from '@tabler/icons-react'
 import { SquareAsterisk } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -51,21 +40,21 @@ export const sidebarData: SidebarData = {
           icon: IconChecklist,
         },
         {
-          title: 'Apps',
+          title: 'Ofertas',
           url: '/apps',
           icon: IconPackages,
         },
-        {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: IconMessages,
-        },
-        {
-          title: 'Users',
-          url: '/users',
-          icon: IconUsers,
-        },
+        // {
+        //   title: 'Chats',
+        //   url: '/chats',
+        //   badge: '3',
+        //   icon: IconMessages,
+        // },
+        // {
+        //   title: 'Users',
+        //   url: '/users',
+        //   icon: IconUsers,
+        // },
       ],
     },
     {
@@ -75,11 +64,11 @@ export const sidebarData: SidebarData = {
           title: 'Configurações',
           icon: IconSettings,
           items: [
-            {
-              title: 'Perfil',
-              url: '/settings',
-              icon: IconUserCog,
-            },
+            // {
+            //   title: 'Perfil',
+            //   url: '/settings',
+            //   icon: IconUserCog,
+            // },
             {
               title: 'Conta',
               url: '/settings/account',

@@ -21,11 +21,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 const appearanceFormSchema = z.object({
   theme: z.enum(['light', 'dark'], {
-    required_error: 'Please select a theme.',
+    required_error: 'Por favor, selecione um tema.',
   }),
   font: z.enum(fonts, {
-    invalid_type_error: 'Select a font',
-    required_error: 'Please select a font.',
+    invalid_type_error: 'Selecione uma fonte.',
+    required_error: 'Por favor, selecione uma fonte.',
   }),
 })
 
@@ -51,7 +51,7 @@ export function AppearanceForm() {
     if (data.theme != theme) setTheme(data.theme)
 
     toast({
-      title: 'You submitted the following values:',
+      title: 'Você atualizou suas preferências.',
       description: (
         <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
           <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
@@ -68,7 +68,7 @@ export function AppearanceForm() {
           name='font'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Font</FormLabel>
+              <FormLabel>Fonte</FormLabel>
               <div className='relative w-max'>
                 <FormControl>
                   <select
@@ -88,7 +88,7 @@ export function AppearanceForm() {
                 <ChevronDownIcon className='absolute right-3 top-2.5 h-4 w-4 opacity-50' />
               </div>
               <FormDescription className='font-manrope'>
-                Set the font you want to use in the dashboard.
+                Selecione a fonte para o sistema.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -99,9 +99,9 @@ export function AppearanceForm() {
           name='theme'
           render={({ field }) => (
             <FormItem className='space-y-1'>
-              <FormLabel>Theme</FormLabel>
+              <FormLabel>Tema</FormLabel>
               <FormDescription>
-                Select the theme for the dashboard.
+                Selecione o tema para o sistema.
               </FormDescription>
               <FormMessage />
               <RadioGroup
@@ -131,7 +131,7 @@ export function AppearanceForm() {
                       </div>
                     </div>
                     <span className='block w-full p-2 text-center font-normal'>
-                      Light
+                      Claro
                     </span>
                   </FormLabel>
                 </FormItem>
@@ -157,7 +157,7 @@ export function AppearanceForm() {
                       </div>
                     </div>
                     <span className='block w-full p-2 text-center font-normal'>
-                      Dark
+                      Escuro
                     </span>
                   </FormLabel>
                 </FormItem>
@@ -166,7 +166,7 @@ export function AppearanceForm() {
           )}
         />
 
-        <Button type='submit'>Update preferences</Button>
+        <Button type='submit'>Atualizar Preferências</Button>
       </form>
     </Form>
   )

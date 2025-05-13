@@ -1,20 +1,13 @@
 import { z } from 'zod'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
-import { CalendarIcon, CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { CalendarIcon} from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
+
 import {
   Form,
   FormControl,
@@ -31,17 +24,17 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 
-const languages = [
-  { label: 'English', value: 'en' },
-  { label: 'French', value: 'fr' },
-  { label: 'German', value: 'de' },
-  { label: 'Spanish', value: 'es' },
-  { label: 'Portuguese', value: 'pt' },
-  { label: 'Russian', value: 'ru' },
-  { label: 'Japanese', value: 'ja' },
-  { label: 'Korean', value: 'ko' },
-  { label: 'Chinese', value: 'zh' },
-] as const
+// const languages = [
+//   { label: 'English', value: 'en' },
+//   { label: 'French', value: 'fr' },
+//   { label: 'German', value: 'de' },
+//   { label: 'Spanish', value: 'es' },
+//   { label: 'Portuguese', value: 'pt' },
+//   { label: 'Russian', value: 'ru' },
+//   { label: 'Japanese', value: 'ja' },
+//   { label: 'Korean', value: 'ko' },
+//   { label: 'Chinese', value: 'zh' },
+// ] as const
 
 const accountFormSchema = z.object({
   name: z
@@ -92,13 +85,12 @@ export function AccountForm() {
           name='name'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder='Your name' {...field} />
+                <Input placeholder='Seu nome' {...field} />
               </FormControl>
               <FormDescription>
-                This is the name that will be displayed on your profile and in
-                emails.
+                Esse nome será exibido em seu perfil.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -109,7 +101,7 @@ export function AccountForm() {
           name='dob'
           render={({ field }) => (
             <FormItem className='flex flex-col'>
-              <FormLabel>Date of birth</FormLabel>
+              <FormLabel>Data de Aniversário</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -140,14 +132,14 @@ export function AccountForm() {
                   />
                 </PopoverContent>
               </Popover>
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
+              {/* <FormDescription>
+                Sua data de aniversário não será exibida publicamente.
+              </FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control}
           name='language'
           render={({ field }) => (
@@ -209,8 +201,8 @@ export function AccountForm() {
               <FormMessage />
             </FormItem>
           )}
-        />
-        <Button type='submit'>Update account</Button>
+        /> */}
+        <Button type='submit'>Atualizar Conta</Button>
       </form>
     </Form>
   )

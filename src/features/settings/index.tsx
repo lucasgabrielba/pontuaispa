@@ -1,10 +1,8 @@
 import { Outlet } from '@tanstack/react-router'
 import {
-  IconBrowserCheck,
   IconNotification,
   IconPalette,
   IconTool,
-  IconUser,
 } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import { Header } from '@/components/layout/header'
@@ -50,11 +48,11 @@ export default function Settings() {
 }
 
 const sidebarNavItems = [
-  {
-    title: 'Perfil',
-    icon: <IconUser size={18} />,
-    href: '/settings',
-  },
+  // {
+  //   title: 'Perfil',
+  //   icon: <IconUser size={18} />,
+  //   href: '/settings',
+  // },
   {
     title: 'Conta',
     icon: <IconTool size={18} />,

@@ -1,59 +1,18 @@
-# Shadcn Admin Dashboard
+# PontuAI
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+Sistema inteligente que ajuda usuários a maximizar seus pontos de cartão de crédito, identificando oportunidades para acumular mais benefícios em programas de fidelidade.
 
-![alt text](public/images/shadcn-admin.png)
+![alt text](public/images/pontuai-preview.png)
 
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
+## Sobre o Projeto
 
-> This is not a starter project (template) though. I'll probably make one in the future.
+O PontuAI analisa faturas de cartão de crédito para identificar onde o usuário poderia ter acumulado mais pontos, sugerindo alternativas de estabelecimentos ou cartões para maximizar o acúmulo de pontos em programas como Livelo, Smiles e Esfera.
 
-## Features
+## Funcionalidades
 
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global Search Command
-- 10+ pages
-- Extra custom components
-
-## Tech Stack
-
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
-
-**Build Tool:** [Vite](https://vitejs.dev/)
-
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
-
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
-
-**Linting/Formatting:** [Eslint](https://eslint.org/) & [Prettier](https://prettier.io/)
-
-**Icons:** [Tabler Icons](https://tabler.io/icons)
-
-## Run Locally
-
-Clone the project
-Go to the project directory
-
-```bash
-  cd shadcn-admin
-```
-
-Install dependencies
-
-```bash
-  pnpm install
-```
-
-Start the server
-
-```bash
-  pnpm run dev
-```
-
-## License
-
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
-# pontuaispa
+- Upload de faturas em diversos formatos (foto, PDF, CSV)
+- Análise personalizada de padrões de consumo
+- Recomendações de cartões e estabelecimentos
+- Dashboard intuitivo para acompanhamento
+- Modo claro/escuro
+- Responsivo e acessível
