@@ -5,13 +5,24 @@ import { SearchProvider } from '@/context/search-context'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import SkipToMain from '@/components/skip-to-main'
+import { useAuthGuard } from '@/utils/auth-guard'
 
 export const Route = createFileRoute('/_authenticated')({
+  beforeLoad: async () => {
+    // Aqui você pode adicionar lógica adicional antes de carregar a rota
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const defaultOpen = Cookies.get('sidebar:state') !== 'false'
+  
+  const { isLoading } = useAuthGuard()
+  
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center">Carregando...</div>
+  }
+  
   return (
     <SearchProvider>
       <SidebarProvider defaultOpen={defaultOpen}>
