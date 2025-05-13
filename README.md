@@ -2,8 +2,6 @@
 
 Sistema inteligente que ajuda usuários a maximizar seus pontos de cartão de crédito, identificando oportunidades para acumular mais benefícios em programas de fidelidade.
 
-![alt text](public/images/pontuai-preview.png)
-
 ## Sobre o Projeto
 
 O PontuAI analisa faturas de cartão de crédito para identificar onde o usuário poderia ter acumulado mais pontos, sugerindo alternativas de estabelecimentos ou cartões para maximizar o acúmulo de pontos em programas como Livelo, Smiles e Esfera.
