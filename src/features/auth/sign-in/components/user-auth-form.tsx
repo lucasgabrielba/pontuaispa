@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+// import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -93,7 +93,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               {login.isPending ? 'Entrando...' : 'Entrar'}
             </Button>
 
-            <div className='relative my-2'>
+            {/* <div className='relative my-2'>
               <div className='absolute inset-0 flex items-center'>
                 <span className='w-full border-t' />
               </div>
@@ -102,9 +102,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                   Ou continue com
                 </span>
               </div>
-            </div>
+            </div> */}
 
-            <div className='flex items-center gap-2'>
+            {/* <div className='flex items-center gap-2'>
               <Button
                 variant='outline'
                 className='w-full'
@@ -121,7 +121,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               >
                 <IconBrandFacebook className='h-4 w-4' /> Facebook
               </Button>
-            </div>
+            </div> */}
           </div>
         </form>
       </Form>
