@@ -1,11 +1,9 @@
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-
 interface GeneralErrorProps extends React.HTMLAttributes<HTMLDivElement> {
   minimal?: boolean
 }
-
 export default function GeneralError({
   className,
   minimal = false,
@@ -18,16 +16,16 @@ export default function GeneralError({
         {!minimal && (
           <h1 className='text-[7rem] font-bold leading-tight'>500</h1>
         )}
-        <span className='font-medium'>Oops! Something went wrong {`:')`}</span>
+        <span className='font-medium'>Ops! Algo deu errado {`:')`}</span>
         <p className='text-center text-muted-foreground'>
-          We apologize for the inconvenience. <br /> Please try again later.
+          Pedimos desculpas pelo inconveniente. <br /> Por favor, tente novamente mais tarde.
         </p>
         {!minimal && (
           <div className='mt-6 flex gap-4'>
             <Button variant='outline' onClick={() => history.go(-1)}>
-              Go Back
+              Voltar
             </Button>
-            <Button onClick={() => navigate({ to: '/' })}>Back to Home</Button>
+            <Button onClick={() => navigate({ to: '/' })}>Voltar para Início</Button>
           </div>
         )}
       </div>

@@ -85,19 +85,19 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to='/settings/account'>
+                <Link to='/configuracoes/conta'>
                   <BadgeCheck />
                   Conta
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to='/settings'>
+                <Link to='/configuracoes'>
                   <CreditCard />
                   Assinatura
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to='/settings/notifications'>
+                <Link to='/configuracoes/notificacoes'>
                   <Bell />
                   Notificações
                 </Link>

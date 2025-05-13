@@ -1,14 +1,12 @@
 import {
-  IconChecklist,
   IconHelp,
   IconLayoutDashboard,
   IconNotification,
-  IconPackages,
   IconPalette,
   IconSettings,
   IconTool,
 } from '@tabler/icons-react'
-import { SquareAsterisk } from 'lucide-react'
+import { CreditCard, FileText, SquareAsterisk, Waypoints } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -35,26 +33,20 @@ export const sidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
-          title: 'Gastos',
-          url: '/tasks',
-          icon: IconChecklist,
+          title: 'Cartões',
+          url: '/cartoes',
+          icon: CreditCard,
         },
         {
-          title: 'Ofertas',
-          url: '/apps',
-          icon: IconPackages,
+          title: 'Faturas',
+          url: '/faturas',
+          icon: FileText,
         },
-        // {
-        //   title: 'Chats',
-        //   url: '/chats',
-        //   badge: '3',
-        //   icon: IconMessages,
-        // },
-        // {
-        //   title: 'Users',
-        //   url: '/users',
-        //   icon: IconUsers,
-        // },
+        {
+          title: 'Pontos',
+          url: '/pontos',
+          icon: Waypoints,
+        },
       ],
     },
     {
@@ -64,36 +56,26 @@ export const sidebarData: SidebarData = {
           title: 'Configurações',
           icon: IconSettings,
           items: [
-            // {
-            //   title: 'Perfil',
-            //   url: '/settings',
-            //   icon: IconUserCog,
-            // },
             {
               title: 'Conta',
-              url: '/settings/account',
+              url: '/configuracoes/conta',
               icon: IconTool,
             },
             {
               title: 'Aparência',
-              url: '/settings/appearance',
+              url: '/configuracoes/aparencia',
               icon: IconPalette,
             },
             {
               title: 'Notificações',
-              url: '/settings/notifications',
+              url: '/configuracoes/notificacoes',
               icon: IconNotification,
             },
-            // {
-            //   title: 'Display',
-            //   url: '/settings/display',
-            //   icon: IconBrowserCheck,
-            // },
           ],
         },
         {
           title: 'Central de Ajuda',
-          url: '/help-center',
+          url: '/central-de-ajuda',
           icon: IconHelp,
         },
       ],

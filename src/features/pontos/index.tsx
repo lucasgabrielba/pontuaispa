@@ -19,7 +19,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts'
-import { IconCalendar, IconPointerStar } from '@tabler/icons-react'
+import { Calendar, Waypoints } from 'lucide-react'
 
 export default function PontosPage() {
   const [activeTab, setActiveTab] = useState('resumo')
@@ -33,7 +33,7 @@ export default function PontosPage() {
             className="gap-2"
             onClick={() => window.location.href = "/"}
           >
-            <IconPointerStar size={18} />
+            <Waypoints size={18} />
             Pontos
           </Button>
         </div>
@@ -138,7 +138,7 @@ export default function PontosPage() {
                         <TableCell>
                           {programa.proximaExpiracao ? (
                             <div className="flex items-center">
-                              <IconCalendar size={14} className="mr-1 text-muted-foreground" />
+                              <Calendar size={14} className="mr-1 text-muted-foreground" />
                               {programa.proximaExpiracao}
                             </div>
                           ) : (

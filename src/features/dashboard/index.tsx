@@ -22,7 +22,7 @@ import { Overview } from './components/overview'
 import { RecentTransactions } from './components/recent-transactions'
 import { PointsStatus } from './components/points-status'
 import { RecommendationsList } from './components/recommendations-list'
-import { IconUpload, IconCreditCard, IconPointerStar } from '@tabler/icons-react'
+import { CreditCard, Upload, Waypoints } from 'lucide-react'
 
 export default function Dashboard() {
   return (
@@ -43,7 +43,7 @@ export default function Dashboard() {
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
           <div className='flex items-center space-x-2'>
             <Button onClick={() => window.location.href="/faturas/upload"}>
-              <IconUpload className="mr-2 h-4 w-4" />
+              <Upload className="mr-2 h-4 w-4" />
               Enviar Fatura
             </Button>
           </div>
@@ -92,7 +92,7 @@ export default function Dashboard() {
                   <CardTitle className='text-sm font-medium'>
                     Pontos Ganhos
                   </CardTitle>
-                  <IconPointerStar className="h-4 w-4 text-muted-foreground" />
+                  <Waypoints className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className='text-2xl font-bold'>1.258</div>
@@ -106,7 +106,7 @@ export default function Dashboard() {
                   <CardTitle className='text-sm font-medium'>
                     Potencial de Pontos
                   </CardTitle>
-                  <IconPointerStar className="h-4 w-4 text-muted-foreground" />
+                  <Waypoints className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className='text-2xl font-bold'>+2.431</div>
@@ -120,7 +120,7 @@ export default function Dashboard() {
                   <CardTitle className='text-sm font-medium'>
                     Cartões Ativos
                   </CardTitle>
-                  <IconCreditCard className="h-4 w-4 text-muted-foreground" />
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className='text-2xl font-bold'>2</div>

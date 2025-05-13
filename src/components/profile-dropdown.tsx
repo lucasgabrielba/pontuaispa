@@ -38,19 +38,19 @@ export function ProfileDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to='/settings'>
+            <Link to='/configuracoes'>
               Conta
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to='/settings'>
+            <Link to='/configuracoes'>
               Assinatura
               <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to='/settings'>
+            <Link to='/configuracoes'>
               Configurações
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </Link>

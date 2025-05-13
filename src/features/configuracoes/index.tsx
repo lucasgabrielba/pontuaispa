@@ -48,29 +48,19 @@ export default function Settings() {
 }
 
 const sidebarNavItems = [
-  // {
-  //   title: 'Perfil',
-  //   icon: <IconUser size={18} />,
-  //   href: '/settings',
-  // },
   {
     title: 'Conta',
     icon: <IconTool size={18} />,
-    href: '/settings/account',
+    href: '/configuracoes/conta',
   },
   {
     title: 'Aparência',
     icon: <IconPalette size={18} />,
-    href: '/settings/appearance',
+    href: '/configuracoes/aparencia',
   },
   {
     title: 'Notificações',
     icon: <IconNotification size={18} />,
-    href: '/settings/notifications',
+    href: '/configuracoes/notificacoes',
   },
-  // {
-  //   title: 'Display',
-  //   icon: <IconBrowserCheck size={18} />,
-  //   href: '/settings/display',
-  // },
 ]
