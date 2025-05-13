@@ -42,7 +42,7 @@ export default function Dashboard() {
         <div className='mb-2 flex items-center justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
           <div className='flex items-center space-x-2'>
-            <Button onClick={() => window.location.href="/faturas/upload"}>
+            <Button onClick={() => window.location.href="/faturas"}>
               <Upload className="mr-2 h-4 w-4" />
               Enviar Fatura
             </Button>

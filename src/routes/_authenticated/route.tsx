@@ -16,13 +16,19 @@ export const Route = createFileRoute('/_authenticated')({
 
 function RouteComponent() {
   const defaultOpen = Cookies.get('sidebar:state') !== 'false'
-  
   const { isLoading } = useAuthGuard()
-  
+
   if (isLoading) {
-    return <div className="flex h-screen items-center justify-center">Carregando...</div>
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="relative">
+          <div className="h-12 w-12 rounded-full border-2 border-t-blue-900 border-r-transparent border-b-blue-900 border-l-transparent animate-spin"></div>
+          <div className="mt-4 text-sm text-gray-600 font-medium">Carregando</div>
+        </div>
+      </div>
+    )
   }
-  
+
   return (
     <SearchProvider>
       <SidebarProvider defaultOpen={defaultOpen}>
