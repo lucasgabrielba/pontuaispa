@@ -4,8 +4,8 @@ import ProfileForm from './profile-form'
 export default function SettingsProfile() {
   return (
     <ContentSection
-      title='Profile'
-      desc='This is how others will see you on the site.'
+      title='Perfil'
+      desc='Gerencie suas informações pessoais, como nome, e-mail e foto de perfil.'
     >
       <ProfileForm />
     </ContentSection>

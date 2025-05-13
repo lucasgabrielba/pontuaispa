@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { useAuth } from '@/hooks/use-auth'
 
 export function NavUser({
   user,
@@ -34,6 +35,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { logout } = useAuth()
 
   return (
     <SidebarMenu>
@@ -77,7 +79,7 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
-                Upgrade to Pro
+                Upgrade para o Pro
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -85,26 +87,26 @@ export function NavUser({
               <DropdownMenuItem asChild>
                 <Link to='/settings/account'>
                   <BadgeCheck />
-                  Account
+                  Conta
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to='/settings'>
                   <CreditCard />
-                  Billing
+                  Assinatura
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to='/settings/notifications'>
                   <Bell />
-                  Notifications
+                  Notificações
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => logout.mutate()}>
               <LogOut />
-              Log out
+              Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
