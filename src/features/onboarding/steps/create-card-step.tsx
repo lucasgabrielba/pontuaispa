@@ -23,7 +23,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome do cartão é obrigatório' }),
@@ -43,19 +42,13 @@ interface CreateCardStepProps {
 }
 
 export default function CreateCardStep({ setActiveStep }: CreateCardStepProps) {
-  const { createCard, rewardPrograms } = useOnboarding()
+  const { createCard } = useOnboarding()
   const [banks, setBanks] = useState<string[]>([])
-  const [rewardProgramsState, setRewardProgramsState] = useState<{id: string, name: string}[]>([])
 
   useEffect(() => {
     // Carregar bancos
     onboardingService.getBanks().then(response => {
       setBanks(response.data)
-    })
-
-    // Carregar programas de recompensas
-    onboardingService.getMockRewardPrograms().then(response => {
-      setRewardProgramsState(response.data)
     })
   }, [])
 
@@ -176,39 +169,6 @@ export default function CreateCardStep({ setActiveStep }: CreateCardStepProps) {
               )}
             />
           </div>
-
-          <Separator className="my-4" />
-          
-          <FormField
-            control={form.control}
-            name="reward_program_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Programa de Pontos</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o programa de pontos" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {rewardProgramsState.map(program => (
-                      <SelectItem key={program.id} value={program.id}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Programa principal de pontos do cartão
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           
           <FormField
             control={form.control}
