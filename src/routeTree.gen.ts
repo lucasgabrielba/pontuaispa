@@ -42,6 +42,9 @@ const AuthenticatedUsersIndexLazyImport = createFileRoute(
 const AuthenticatedTasksIndexLazyImport = createFileRoute(
   '/_authenticated/tasks/',
 )()
+const AuthenticatedOnboardingIndexLazyImport = createFileRoute(
+  '/_authenticated/onboarding/',
+)()
 const AuthenticatedFaturasIndexLazyImport = createFileRoute(
   '/_authenticated/faturas/',
 )()
@@ -191,6 +194,17 @@ const AuthenticatedTasksIndexLazyRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/tasks/index.lazy').then((d) => d.Route),
+  )
+
+const AuthenticatedOnboardingIndexLazyRoute =
+  AuthenticatedOnboardingIndexLazyImport.update({
+    id: '/onboarding/',
+    path: '/onboarding/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/onboarding/index.lazy').then(
+      (d) => d.Route,
+    ),
   )
 
 const AuthenticatedFaturasIndexLazyRoute =
@@ -460,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFaturasIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/onboarding/': {
+      id: '/_authenticated/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/tasks/': {
       id: '/_authenticated/tasks/'
       path: '/tasks'
@@ -512,6 +533,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentralDeAjudaIndexLazyRoute: typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   AuthenticatedChatsIndexLazyRoute: typeof AuthenticatedChatsIndexLazyRoute
   AuthenticatedFaturasIndexLazyRoute: typeof AuthenticatedFaturasIndexLazyRoute
+  AuthenticatedOnboardingIndexLazyRoute: typeof AuthenticatedOnboardingIndexLazyRoute
   AuthenticatedTasksIndexLazyRoute: typeof AuthenticatedTasksIndexLazyRoute
   AuthenticatedUsersIndexLazyRoute: typeof AuthenticatedUsersIndexLazyRoute
 }
@@ -527,6 +549,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCentralDeAjudaIndexLazyRoute,
   AuthenticatedChatsIndexLazyRoute: AuthenticatedChatsIndexLazyRoute,
   AuthenticatedFaturasIndexLazyRoute: AuthenticatedFaturasIndexLazyRoute,
+  AuthenticatedOnboardingIndexLazyRoute: AuthenticatedOnboardingIndexLazyRoute,
   AuthenticatedTasksIndexLazyRoute: AuthenticatedTasksIndexLazyRoute,
   AuthenticatedUsersIndexLazyRoute: AuthenticatedUsersIndexLazyRoute,
 }
@@ -558,6 +581,7 @@ export interface FileRoutesByFullPath {
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/configuracoes/': typeof AuthenticatedConfiguracoesIndexLazyRoute
   '/faturas': typeof AuthenticatedFaturasIndexLazyRoute
+  '/onboarding': typeof AuthenticatedOnboardingIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
   '/users': typeof AuthenticatedUsersIndexLazyRoute
 }
@@ -584,6 +608,7 @@ export interface FileRoutesByTo {
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesIndexLazyRoute
   '/faturas': typeof AuthenticatedFaturasIndexLazyRoute
+  '/onboarding': typeof AuthenticatedOnboardingIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
   '/users': typeof AuthenticatedUsersIndexLazyRoute
 }
@@ -614,6 +639,7 @@ export interface FileRoutesById {
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexLazyRoute
   '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexLazyRoute
   '/_authenticated/faturas/': typeof AuthenticatedFaturasIndexLazyRoute
+  '/_authenticated/onboarding/': typeof AuthenticatedOnboardingIndexLazyRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexLazyRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexLazyRoute
 }
@@ -644,6 +670,7 @@ export interface FileRouteTypes {
     | '/chats'
     | '/configuracoes/'
     | '/faturas'
+    | '/onboarding'
     | '/tasks'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
@@ -669,6 +696,7 @@ export interface FileRouteTypes {
     | '/chats'
     | '/configuracoes'
     | '/faturas'
+    | '/onboarding'
     | '/tasks'
     | '/users'
   id:
@@ -697,6 +725,7 @@ export interface FileRouteTypes {
     | '/_authenticated/chats/'
     | '/_authenticated/configuracoes/'
     | '/_authenticated/faturas/'
+    | '/_authenticated/onboarding/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
   fileRoutesById: FileRoutesById
@@ -767,6 +796,7 @@ export const routeTree = rootRoute
         "/_authenticated/central-de-ajuda/",
         "/_authenticated/chats/",
         "/_authenticated/faturas/",
+        "/_authenticated/onboarding/",
         "/_authenticated/tasks/",
         "/_authenticated/users/"
       ]
@@ -856,6 +886,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/faturas/": {
       "filePath": "_authenticated/faturas/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/onboarding/": {
+      "filePath": "_authenticated/onboarding/index.lazy.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/tasks/": {

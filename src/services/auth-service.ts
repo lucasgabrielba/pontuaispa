@@ -25,7 +25,7 @@ export const authService = {
   logout: () => api.post('/auth/logout'),
   
   // Buscar usuário autenticado
-  getUser: () => api.get('/auth/get-me'),
+  getUser: () => api.get('/auth/user'),
   
   // Verificar se está autenticado
   check: () => api.get('/auth/check')
