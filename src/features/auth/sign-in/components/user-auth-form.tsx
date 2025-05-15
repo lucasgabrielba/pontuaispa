@@ -35,7 +35,7 @@ const formSchema = z.object({
     }),
 })
 
-export function UserAuthFormWithOnboarding({ className, ...props }: UserAuthFormProps) {
+export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { login } = useAuth()
   const navigate = useNavigate()
   const { userCards } = useOnboarding()
