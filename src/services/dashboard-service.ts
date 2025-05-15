@@ -82,7 +82,6 @@ export const dashboardService = {
     return api.get('/dashboard/recommendations');
   },
 
-  // Versão vazia para simular estado sem dados
   getEmptyDashboard: () => {
     return Promise.resolve({ 
       data: {

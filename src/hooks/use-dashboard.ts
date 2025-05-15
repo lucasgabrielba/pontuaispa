@@ -4,14 +4,10 @@ import { useQuery } from '@tanstack/react-query'
 
 
 export function useDashboard(hasData = true) {
-  // Buscar todos os dados do dashboard
   const dashboardData = useQuery({
     queryKey: ['dashboard', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Se hasData for false, retorna um dashboard vazio
       if (!hasData) {
         return dashboardService.getEmptyDashboard().then(res => res.data);
       }
@@ -20,13 +16,10 @@ export function useDashboard(hasData = true) {
     staleTime: 5 * 60 * 1000 // 5 minutos
   });
 
-  // Buscar estatísticas gerais
   const stats = useQuery({
     queryKey: ['dashboard', 'stats', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       if (!hasData) {
         return { 
           totalSpent: 0,
@@ -36,6 +29,7 @@ export function useDashboard(hasData = true) {
           spentGrowth: 0
         };
       }
+
       return dashboardService.getStats().then(res => res.data);
     },
     staleTime: 5 * 60 * 1000
@@ -45,9 +39,7 @@ export function useDashboard(hasData = true) {
   const transactions = useQuery({
     queryKey: ['dashboard', 'transactions', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
+
       if (!hasData) {
         return [];
       }
@@ -60,9 +52,7 @@ export function useDashboard(hasData = true) {
   const pointsPrograms = useQuery({
     queryKey: ['dashboard', 'points-programs', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       if (!hasData) {
         return [];
       }
@@ -75,9 +65,7 @@ export function useDashboard(hasData = true) {
   const pointsByCategory = useQuery({
     queryKey: ['dashboard', 'points-by-category', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       if (!hasData) {
         return [];
       }
@@ -90,9 +78,7 @@ export function useDashboard(hasData = true) {
   const monthlySpent = useQuery({
     queryKey: ['dashboard', 'monthly-spent', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 900));
-      
+
       if (!hasData) {
         return [];
       }
@@ -105,9 +91,7 @@ export function useDashboard(hasData = true) {
   const recommendations = useQuery({
     queryKey: ['dashboard', 'recommendations', hasData],
     queryFn: async () => {
-      // Simula uma API lenta
-      await new Promise(resolve => setTimeout(resolve, 1300));
-      
+
       if (!hasData) {
         return [];
       }
