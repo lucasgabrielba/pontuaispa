@@ -36,12 +36,6 @@ const authForgotPasswordLazyImport = createFileRoute(
 const AuthenticatedConfiguracoesRouteLazyImport = createFileRoute(
   '/_authenticated/configuracoes',
 )()
-const AuthenticatedUsersIndexLazyImport = createFileRoute(
-  '/_authenticated/users/',
-)()
-const AuthenticatedTasksIndexLazyImport = createFileRoute(
-  '/_authenticated/tasks/',
-)()
 const AuthenticatedOnboardingIndexLazyImport = createFileRoute(
   '/_authenticated/onboarding/',
 )()
@@ -56,9 +50,6 @@ const AuthenticatedChatsIndexLazyImport = createFileRoute(
 )()
 const AuthenticatedCentralDeAjudaIndexLazyImport = createFileRoute(
   '/_authenticated/central-de-ajuda/',
-)()
-const AuthenticatedAppsIndexLazyImport = createFileRoute(
-  '/_authenticated/apps/',
 )()
 const AuthenticatedConfiguracoesNotificacoesLazyImport = createFileRoute(
   '/_authenticated/configuracoes/notificacoes',
@@ -178,24 +169,6 @@ const auth500Route = auth500Import.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthenticatedUsersIndexLazyRoute =
-  AuthenticatedUsersIndexLazyImport.update({
-    id: '/users/',
-    path: '/users/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/users/index.lazy').then((d) => d.Route),
-  )
-
-const AuthenticatedTasksIndexLazyRoute =
-  AuthenticatedTasksIndexLazyImport.update({
-    id: '/tasks/',
-    path: '/tasks/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/tasks/index.lazy').then((d) => d.Route),
-  )
-
 const AuthenticatedOnboardingIndexLazyRoute =
   AuthenticatedOnboardingIndexLazyImport.update({
     id: '/onboarding/',
@@ -246,16 +219,6 @@ const AuthenticatedCentralDeAjudaIndexLazyRoute =
       (d) => d.Route,
     ),
   )
-
-const AuthenticatedAppsIndexLazyRoute = AuthenticatedAppsIndexLazyImport.update(
-  {
-    id: '/apps/',
-    path: '/apps/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any,
-).lazy(() =>
-  import('./routes/_authenticated/apps/index.lazy').then((d) => d.Route),
-)
 
 const AuthenticatedPontosIndexRoute = AuthenticatedPontosIndexImport.update({
   id: '/pontos/',
@@ -439,13 +402,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPontosIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
-    '/_authenticated/apps/': {
-      id: '/_authenticated/apps/'
-      path: '/apps'
-      fullPath: '/apps'
-      preLoaderRoute: typeof AuthenticatedAppsIndexLazyImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
     '/_authenticated/central-de-ajuda/': {
       id: '/_authenticated/central-de-ajuda/'
       path: '/central-de-ajuda'
@@ -479,20 +435,6 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingIndexLazyImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
-    '/_authenticated/tasks/': {
-      id: '/_authenticated/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthenticatedTasksIndexLazyImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
-    '/_authenticated/users/': {
-      id: '/_authenticated/users/'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthenticatedUsersIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
   }
@@ -529,13 +471,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCartoesIndexRoute: typeof AuthenticatedCartoesIndexRoute
   AuthenticatedPontosIndexRoute: typeof AuthenticatedPontosIndexRoute
-  AuthenticatedAppsIndexLazyRoute: typeof AuthenticatedAppsIndexLazyRoute
   AuthenticatedCentralDeAjudaIndexLazyRoute: typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   AuthenticatedChatsIndexLazyRoute: typeof AuthenticatedChatsIndexLazyRoute
   AuthenticatedFaturasIndexLazyRoute: typeof AuthenticatedFaturasIndexLazyRoute
   AuthenticatedOnboardingIndexLazyRoute: typeof AuthenticatedOnboardingIndexLazyRoute
-  AuthenticatedTasksIndexLazyRoute: typeof AuthenticatedTasksIndexLazyRoute
-  AuthenticatedUsersIndexLazyRoute: typeof AuthenticatedUsersIndexLazyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -544,14 +483,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCartoesIndexRoute: AuthenticatedCartoesIndexRoute,
   AuthenticatedPontosIndexRoute: AuthenticatedPontosIndexRoute,
-  AuthenticatedAppsIndexLazyRoute: AuthenticatedAppsIndexLazyRoute,
   AuthenticatedCentralDeAjudaIndexLazyRoute:
     AuthenticatedCentralDeAjudaIndexLazyRoute,
   AuthenticatedChatsIndexLazyRoute: AuthenticatedChatsIndexLazyRoute,
   AuthenticatedFaturasIndexLazyRoute: AuthenticatedFaturasIndexLazyRoute,
   AuthenticatedOnboardingIndexLazyRoute: AuthenticatedOnboardingIndexLazyRoute,
-  AuthenticatedTasksIndexLazyRoute: AuthenticatedTasksIndexLazyRoute,
-  AuthenticatedUsersIndexLazyRoute: AuthenticatedUsersIndexLazyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -576,14 +512,11 @@ export interface FileRoutesByFullPath {
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
   '/cartoes': typeof AuthenticatedCartoesIndexRoute
   '/pontos': typeof AuthenticatedPontosIndexRoute
-  '/apps': typeof AuthenticatedAppsIndexLazyRoute
   '/central-de-ajuda': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/configuracoes/': typeof AuthenticatedConfiguracoesIndexLazyRoute
   '/faturas': typeof AuthenticatedFaturasIndexLazyRoute
   '/onboarding': typeof AuthenticatedOnboardingIndexLazyRoute
-  '/tasks': typeof AuthenticatedTasksIndexLazyRoute
-  '/users': typeof AuthenticatedUsersIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -603,14 +536,11 @@ export interface FileRoutesByTo {
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
   '/cartoes': typeof AuthenticatedCartoesIndexRoute
   '/pontos': typeof AuthenticatedPontosIndexRoute
-  '/apps': typeof AuthenticatedAppsIndexLazyRoute
   '/central-de-ajuda': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesIndexLazyRoute
   '/faturas': typeof AuthenticatedFaturasIndexLazyRoute
   '/onboarding': typeof AuthenticatedOnboardingIndexLazyRoute
-  '/tasks': typeof AuthenticatedTasksIndexLazyRoute
-  '/users': typeof AuthenticatedUsersIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -634,14 +564,11 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
   '/_authenticated/cartoes/': typeof AuthenticatedCartoesIndexRoute
   '/_authenticated/pontos/': typeof AuthenticatedPontosIndexRoute
-  '/_authenticated/apps/': typeof AuthenticatedAppsIndexLazyRoute
   '/_authenticated/central-de-ajuda/': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexLazyRoute
   '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexLazyRoute
   '/_authenticated/faturas/': typeof AuthenticatedFaturasIndexLazyRoute
   '/_authenticated/onboarding/': typeof AuthenticatedOnboardingIndexLazyRoute
-  '/_authenticated/tasks/': typeof AuthenticatedTasksIndexLazyRoute
-  '/_authenticated/users/': typeof AuthenticatedUsersIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -665,14 +592,11 @@ export interface FileRouteTypes {
     | '/configuracoes/notificacoes'
     | '/cartoes'
     | '/pontos'
-    | '/apps'
     | '/central-de-ajuda'
     | '/chats'
     | '/configuracoes/'
     | '/faturas'
     | '/onboarding'
-    | '/tasks'
-    | '/users'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/500'
@@ -691,14 +615,11 @@ export interface FileRouteTypes {
     | '/configuracoes/notificacoes'
     | '/cartoes'
     | '/pontos'
-    | '/apps'
     | '/central-de-ajuda'
     | '/chats'
     | '/configuracoes'
     | '/faturas'
     | '/onboarding'
-    | '/tasks'
-    | '/users'
   id:
     | '__root__'
     | '/_authenticated'
@@ -720,14 +641,11 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes/notificacoes'
     | '/_authenticated/cartoes/'
     | '/_authenticated/pontos/'
-    | '/_authenticated/apps/'
     | '/_authenticated/central-de-ajuda/'
     | '/_authenticated/chats/'
     | '/_authenticated/configuracoes/'
     | '/_authenticated/faturas/'
     | '/_authenticated/onboarding/'
-    | '/_authenticated/tasks/'
-    | '/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
 
@@ -792,13 +710,10 @@ export const routeTree = rootRoute
         "/_authenticated/",
         "/_authenticated/cartoes/",
         "/_authenticated/pontos/",
-        "/_authenticated/apps/",
         "/_authenticated/central-de-ajuda/",
         "/_authenticated/chats/",
         "/_authenticated/faturas/",
-        "/_authenticated/onboarding/",
-        "/_authenticated/tasks/",
-        "/_authenticated/users/"
+        "/_authenticated/onboarding/"
       ]
     },
     "/(auth)/500": {
@@ -868,10 +783,6 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/pontos/index.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/apps/": {
-      "filePath": "_authenticated/apps/index.lazy.tsx",
-      "parent": "/_authenticated"
-    },
     "/_authenticated/central-de-ajuda/": {
       "filePath": "_authenticated/central-de-ajuda/index.lazy.tsx",
       "parent": "/_authenticated"
@@ -890,14 +801,6 @@ export const routeTree = rootRoute
     },
     "/_authenticated/onboarding/": {
       "filePath": "_authenticated/onboarding/index.lazy.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/tasks/": {
-      "filePath": "_authenticated/tasks/index.lazy.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/users/": {
-      "filePath": "_authenticated/users/index.lazy.tsx",
       "parent": "/_authenticated"
     }
   }

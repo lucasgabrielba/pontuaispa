@@ -9,7 +9,7 @@ import UploadInvoiceStep from "./steps/upload-invoice-step"
 import SuccessStep from "./steps/success-step"
 import { Footer } from "./components/footer"
 import { Progress } from "@/components/ui/progress"
-import { Navigate, useNavigate } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 
 // Types for form data
 interface CardData {
