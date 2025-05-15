@@ -12,60 +12,33 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { IconCreditCard, IconArrowUpRight, IconBuildingStore, IconLighter } from '@tabler/icons-react'
 
+interface Recommendation {
+  id: number | string;
+  title: string;
+  description: string;
+  type: "merchant" | "card";
+  recommendation: string;
+  potentialGain: number;
+}
+
 interface RecommendationsListProps {
-  data?: typeof defaultRecommendations
+  data?: Recommendation[]
   isLoading?: boolean
 }
 
-const defaultRecommendations = [
-  {
-    id: 1,
-    title: "Supermercado - Mude de estabelecimento",
-    description: "Você gastou R$ 1.235,00 em supermercados este mês. Recomendamos trocar de estabelecimento para maximizar pontos.",
-    type: "merchant", 
-    recommendation: "Carrefour oferece 4x mais pontos com seu cartão atual",
-    potentialGain: 200,
-  },
-  {
-    id: 2,
-    title: "Postos de combustível - Use outro cartão",
-    description: "Seus gastos em postos são significativos (R$ 420,00/mês). Um cartão específico seria melhor.",
-    type: "card",
-    recommendation: "Cartão Shell Box Itaucard Platinum",
-    potentialGain: 120,
-  },
-  {
-    id: 3,
-    title: "Restaurantes - Concentre seus gastos",
-    description: "Você frequenta restaurantes diversificados. Concentre gastos em estabelecimentos parceiros.",
-    type: "merchant",
-    recommendation: "Rede Outback (5x mais pontos às terças-feiras)",
-    potentialGain: 85,
-  },
-  {
-    id: 4,
-    title: "Streaming - Agrupe serviços",
-    description: "Você paga por vários serviços de streaming separadamente. Agrupe para maximizar pontos.",
-    type: "merchant",
-    recommendation: "Plano combo na Amazon Prime",
-    potentialGain: 45,
-  },
-]
-
 export function RecommendationsList({ data, isLoading = false }: RecommendationsListProps) {
-  const [recommendations, setRecommendations] = useState<typeof defaultRecommendations>([])
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
   const [loading, setLoading] = useState(isLoading)
 
   useEffect(() => {
-    // Simula uma chamada de API
     if (isLoading) {
       const timer = setTimeout(() => {
         setLoading(false)
-        setRecommendations(data || defaultRecommendations)
+        setRecommendations(data || [])
       }, 2200)
       return () => clearTimeout(timer)
     } else {
-      setRecommendations(data || defaultRecommendations)
+      setRecommendations(data || [])
     }
   }, [isLoading, data])
 
@@ -105,7 +78,7 @@ export function RecommendationsList({ data, isLoading = false }: Recommendations
   if (!recommendations || recommendations.length === 0) {
     return (
       <Alert variant="default" className="bg-muted">
-        <IconLighter className="h-4 w-4" />
+        <IconLighter className="h-4 w-4 mr-2" />
         <AlertDescription>
           Para receber recomendações personalizadas, envie mais faturas e continue usando seus cartões. Precisamos de mais dados para gerar sugestões para você.
         </AlertDescription>

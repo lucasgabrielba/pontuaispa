@@ -1,112 +1,106 @@
 // src/hooks/use-dashboard.ts
-import { dashboardService } from '@/services/dashboard-service';
 import { useQuery } from '@tanstack/react-query'
+import { dashboardService } from '@/services/dashboard-service'
 
-
-export function useDashboard(hasData = true) {
-  const dashboardData = useQuery({
-    queryKey: ['dashboard', hasData],
-    queryFn: async () => {
-      
-      if (!hasData) {
-        return dashboardService.getEmptyDashboard().then(res => res.data);
-      }
-      return dashboardService.getDashboardData().then(res => res.data);
-    },
-    staleTime: 5 * 60 * 1000 // 5 minutos
-  });
-
+export const useDashboard = (hasData: boolean = true) => {
+  // Estatísticas gerais
   const stats = useQuery({
-    queryKey: ['dashboard', 'stats', hasData],
+    queryKey: ['dashboard-stats', hasData],
     queryFn: async () => {
-
-      if (!hasData) {
-        return { 
+      if (!hasData) return {
+        totalSpent: 0,
+        pointsEarned: 0,
+        activeCards: 0
+      }
+      
+      try {
+        const response = await dashboardService.getStats()
+        return response.data
+      } catch (error) {
+        console.error('Erro ao obter estatísticas:', error)
+        return {
           totalSpent: 0,
           pointsEarned: 0,
-          potentialPoints: 0,
-          activeCards: 0,
-          spentGrowth: 0
-        };
+          activeCards: 0
+        }
       }
-
-      return dashboardService.getStats().then(res => res.data);
     },
-    staleTime: 5 * 60 * 1000
-  });
-
-  // Buscar transações recentes
+    enabled: true
+  })
+  
+  // Transações recentes
   const transactions = useQuery({
-    queryKey: ['dashboard', 'transactions', hasData],
+    queryKey: ['dashboard-transactions', hasData],
     queryFn: async () => {
-
-      if (!hasData) {
-        return [];
+      if (!hasData) return []
+      
+      try {
+        const response = await dashboardService.getRecentTransactions()
+        return response.data
+      } catch (error) {
+        console.error('Erro ao obter transações:', error)
+        return []
       }
-      return dashboardService.getTransactions().then(res => res.data);
     },
-    staleTime: 5 * 60 * 1000
-  });
-
-  // Buscar programas de pontos
-  const pointsPrograms = useQuery({
-    queryKey: ['dashboard', 'points-programs', hasData],
-    queryFn: async () => {
-
-      if (!hasData) {
-        return [];
-      }
-      return dashboardService.getPointsPrograms().then(res => res.data);
-    },
-    staleTime: 5 * 60 * 1000
-  });
-
-  // Buscar pontos por categoria
-  const pointsByCategory = useQuery({
-    queryKey: ['dashboard', 'points-by-category', hasData],
-    queryFn: async () => {
-
-      if (!hasData) {
-        return [];
-      }
-      return dashboardService.getPointsByCategory().then(res => res.data);
-    },
-    staleTime: 5 * 60 * 1000
-  });
-
-  // Buscar gastos mensais
+    enabled: hasData
+  })
+  
+  // Gastos mensais
   const monthlySpent = useQuery({
-    queryKey: ['dashboard', 'monthly-spent', hasData],
+    queryKey: ['dashboard-monthly-spent', hasData],
     queryFn: async () => {
-
-      if (!hasData) {
-        return [];
+      if (!hasData) return []
+      
+      try {
+        const response = await dashboardService.getMonthlySpent()
+        return response.data
+      } catch (error) {
+        console.error('Erro ao obter gastos mensais:', error)
+        return []
       }
-      return dashboardService.getMonthlySpent().then(res => res.data);
     },
-    staleTime: 5 * 60 * 1000
-  });
-
-  // Buscar recomendações
+    enabled: hasData
+  })
+  
+  // Programas de pontos
+  const pointsPrograms = useQuery({
+    queryKey: ['dashboard-points-programs', hasData],
+    queryFn: async () => {
+      if (!hasData) return []
+      
+      try {
+        const response = await dashboardService.getPointsPrograms()
+        return response.data
+      } catch (error) {
+        console.error('Erro ao obter programas de pontos:', error)
+        return []
+      }
+    },
+    enabled: hasData
+  })
+  
+  // Recomendações
   const recommendations = useQuery({
-    queryKey: ['dashboard', 'recommendations', hasData],
+    queryKey: ['dashboard-recommendations', hasData],
     queryFn: async () => {
-
-      if (!hasData) {
-        return [];
+      if (!hasData) return []
+      
+      try {
+        const response = await dashboardService.getRecommendations()
+        return response.data
+      } catch (error) {
+        console.error('Erro ao obter recomendações:', error)
+        return []
       }
-      return dashboardService.getRecommendations().then(res => res.data);
     },
-    staleTime: 5 * 60 * 1000
-  });
-
+    enabled: hasData
+  })
+  
   return {
-    dashboardData,
     stats,
     transactions,
-    pointsPrograms,
-    pointsByCategory,
     monthlySpent,
-    recommendations,
-  };
+    pointsPrograms,
+    recommendations
+  }
 }

@@ -1,13 +1,5 @@
 import api from '@/lib/api'
 
-export interface DashboardStats {
-  totalSpent: number;
-  pointsEarned: number;
-  potentialPoints: number;
-  activeCards: number;
-  spentGrowth: number;
-}
-
 export interface Transaction {
   id: string;
   merchant: string;
@@ -18,16 +10,12 @@ export interface Transaction {
   isRecommended: boolean;
 }
 
-export interface PointsProgram {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export interface PointsByCategory {
-  nome: string;
-  pontosGanhos: number;
-  pontosPotenciais: number;
+export interface DashboardStats {
+  totalSpent: number;
+  spentGrowth?: number;
+  pointsEarned: number;
+  potentialPoints?: number;
+  activeCards: number;
 }
 
 export interface MonthlySpent {
@@ -35,69 +23,34 @@ export interface MonthlySpent {
   total: number;
 }
 
+export interface PointsProgram {
+  name: string;
+  value: number;
+  color: string;
+}
+
 export interface Recommendation {
-  id: number;
+  id: number | string;
   title: string;
   description: string;
-  type: 'merchant' | 'card';
+  type: "merchant" | "card";
   recommendation: string;
   potentialGain: number;
 }
 
-export interface DashboardData {
-  stats: DashboardStats;
-  transactions: Transaction[];
-  pointsPrograms: PointsProgram[];
-  pointsByCategory: PointsByCategory[];
-  monthlySpent: MonthlySpent[];
-  recommendations: Recommendation[];
-}
-
 export const dashboardService = {
-  getDashboardData: () => {
-    return api.get('/dashboard');
-  },
+  // Obter estatísticas gerais do dashboard
+  getStats: () => api.get('/dashboard/stats'),
   
-  getStats: () => {
-    return api.get('/dashboard/stats');
-  },
+  // Obter transações recentes
+  getRecentTransactions: () => api.get('/dashboard/transactions'),
   
-  getTransactions: () => {
-    return api.get('/dashboard/transactions');
-  },
+  // Obter dados de gastos mensais
+  getMonthlySpent: () => api.get('/dashboard/monthly-spent'),
   
-  getPointsPrograms: () => {
-    return api.get('/dashboard/points-programs');
-  },
+  // Obter distribuição de pontos por programa
+  getPointsPrograms: () => api.get('/dashboard/points-programs'),
   
-  getPointsByCategory: () => {
-    return api.get('/dashboard/points-by-category');
-  },
-  
-  getMonthlySpent: () => {
-    return api.get('/dashboard/monthly-spent');
-  },
-  
-  getRecommendations: () => {
-    return api.get('/dashboard/recommendations');
-  },
-
-  getEmptyDashboard: () => {
-    return Promise.resolve({ 
-      data: {
-        stats: {
-          totalSpent: 0,
-          pointsEarned: 0,
-          potentialPoints: 0,
-          activeCards: 0,
-          spentGrowth: 0
-        },
-        transactions: [],
-        pointsPrograms: [],
-        pointsByCategory: [],
-        monthlySpent: [],
-        recommendations: []
-      }
-    });
-  }
-};
+  // Obter recomendações personalizadas
+  getRecommendations: () => api.get('/dashboard/recommendations'),
+}

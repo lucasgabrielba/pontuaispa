@@ -5,31 +5,23 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface PointsStatusProps {
-  data?: typeof defaultData
+  data?: any[]
   isLoading?: boolean
 }
 
-const defaultData = [
-  { name: 'Livelo', value: 1567, color: '#ff6b6b' },
-  { name: 'Smiles', value: 853, color: '#feca57' },
-  { name: 'Esfera', value: 435, color: '#48dbfb' },
-  { name: 'Outros', value: 214, color: '#1dd1a1' },
-]
-
-export function PointsStatus({ data = defaultData, isLoading = false }: PointsStatusProps) {
-  const [chartData, setChartData] = useState<typeof defaultData>([])
+export function PointsStatus({ data, isLoading = false }: PointsStatusProps) {
+  const [chartData, setChartData] = useState<any[]>([])
   const [loading, setLoading] = useState(isLoading)
 
   useEffect(() => {
-    // Simula uma chamada de API
     if (isLoading) {
       const timer = setTimeout(() => {
         setLoading(false)
-        setChartData(data)
+        setChartData(data || [])
       }, 2000)
       return () => clearTimeout(timer)
     } else {
-      setChartData(data)
+      setChartData(data || [])
     }
   }, [isLoading, data])
 
@@ -48,8 +40,8 @@ export function PointsStatus({ data = defaultData, isLoading = false }: PointsSt
 
   if (!chartData || chartData.length === 0) {
     return (
-      <Alert variant="default" className="bg-muted flex items-center h-[300px]">
-        <BadgeInfo className="h-4 w-4" />
+      <Alert variant="default" className="bg-muted flex items-center justify-center h-[300px]">
+        <BadgeInfo className="h-4 w-4 mr-2" />
         <AlertDescription>
           Você ainda não tem pontos acumulados. Configure seus cartões e adicione faturas para começar a acumular.
         </AlertDescription>

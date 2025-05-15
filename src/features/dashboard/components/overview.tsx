@@ -1,46 +1,19 @@
-
 import { useState, useEffect } from 'react'
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
 
 interface OverviewProps {
-  data?: typeof defaultData
+  data?: any[]
   isLoading?: boolean
 }
 
-const defaultData = [
-  {
-    name: 'Jan',
-    total: 1890,
-  },
-  {
-    name: 'Fev',
-    total: 2350,
-  },
-  {
-    name: 'Mar',
-    total: 3100,
-  },
-  {
-    name: 'Abr',
-    total: 2700,
-  },
-  {
-    name: 'Mai',
-    total: 3250,
-  },
-  {
-    name: 'Jun',
-    total: 3521,
-  },
-]
-
-export function Overview({ data = defaultData, isLoading = false }: OverviewProps) {
-  const [chartData, setChartData] = useState(data)
+export function Overview({ data, isLoading = false }: OverviewProps) {
+  const [chartData, setChartData] = useState<any[]>([])
   const [loading, setLoading] = useState(isLoading)
 
   useEffect(() => {
-    // Simula uma chamada de API
     if (isLoading) {
       const timer = setTimeout(() => {
         setLoading(false)
@@ -50,7 +23,7 @@ export function Overview({ data = defaultData, isLoading = false }: OverviewProp
   }, [isLoading])
 
   useEffect(() => {
-    setChartData(data)
+    setChartData(data || [])
   }, [data])
 
   if (loading) {
@@ -62,6 +35,17 @@ export function Overview({ data = defaultData, isLoading = false }: OverviewProp
         </div>
         <Skeleton className="h-[350px] w-full" />
       </div>
+    )
+  }
+
+  if (!chartData || chartData.length === 0) {
+    return (
+      <Alert variant="default" className="bg-muted flex items-center justify-center h-[350px]">
+        <AlertCircle className="h-4 w-4 mr-2" />
+        <AlertDescription>
+          Nenhum dado disponível. Adicione faturas para visualizar seus gastos mensais.
+        </AlertDescription>
+      </Alert>
     )
   }
 

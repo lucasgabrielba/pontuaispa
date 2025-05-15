@@ -11,68 +11,19 @@ interface RecentTransactionsProps {
   isLoading?: boolean
 }
 
-const defaultTransactions = [
-  {
-    id: '1',
-    merchant: 'Supermercado Extra',
-    merchantLogo: '/placeholder.svg',
-    category: 'Alimentação',
-    amount: 'R$ 243,56',
-    points: 97,
-    isRecommended: true
-  },
-  {
-    id: '2',
-    merchant: 'Netflix',
-    merchantLogo: '/placeholder.svg',
-    category: 'Streaming',
-    amount: 'R$ 55,90',
-    points: 28,
-    isRecommended: false
-  },
-  {
-    id: '3',
-    merchant: 'Posto Shell',
-    merchantLogo: '/placeholder.svg',
-    category: 'Combustível',
-    amount: 'R$ 210,45',
-    points: 110,
-    isRecommended: true
-  },
-  {
-    id: '4',
-    merchant: 'Restaurante Outback',
-    merchantLogo: '/placeholder.svg',
-    category: 'Restaurantes',
-    amount: 'R$ 180,76',
-    points: 90,
-    isRecommended: false
-  },
-  {
-    id: '5',
-    merchant: 'Amazon',
-    merchantLogo: '/placeholder.svg',
-    category: 'Compras Online',
-    amount: 'R$ 143,20',
-    points: 72,
-    isRecommended: true
-  },
-]
-
 export function RecentTransactions({ data, isLoading = false }: RecentTransactionsProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(isLoading)
 
   useEffect(() => {
-    // Simula uma chamada de API
     if (isLoading) {
       const timer = setTimeout(() => {
         setLoading(false)
-        setTransactions(data || defaultTransactions)
+        setTransactions(data || [])
       }, 1800)
       return () => clearTimeout(timer)
     } else {
-      setTransactions(data || defaultTransactions)
+      setTransactions(data || [])
     }
   }, [isLoading, data])
 
@@ -99,7 +50,7 @@ export function RecentTransactions({ data, isLoading = false }: RecentTransactio
   if (!transactions || transactions.length === 0) {
     return (
       <Alert variant="default" className="bg-muted">
-        <AlertCircle className="h-4 w-4" />
+        <AlertCircle className="h-4 w-4 mr-2" />
         <AlertDescription>
           Nenhuma transação encontrada. Adicione uma fatura para começar a analisar seus gastos.
         </AlertDescription>
@@ -135,4 +86,3 @@ export function RecentTransactions({ data, isLoading = false }: RecentTransactio
     </div>
   )
 }
-
