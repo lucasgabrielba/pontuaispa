@@ -46,7 +46,10 @@ const mockRewardPrograms = [
 
 export const onboardingService = {
   // Verificar se o usuário tem cartões
-  checkUserHasCards: () => api.get('/cards'),
+  checkUserHasCards: () => api.get('/cards/has-cards'),
+ 
+  // Verificar se o usuário tem cartões
+  getUserCards: () => api.get('/cards'),
 
   // Criar novo cartão
   createCard: (data: CardCreateRequest) => api.post('/cards', data),

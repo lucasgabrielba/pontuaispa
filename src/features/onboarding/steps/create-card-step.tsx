@@ -1,230 +1,199 @@
-import { useState, useEffect } from 'react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { onboardingService } from '@/services/onboarding-service'
-import { useOnboarding } from '@/hooks/use-onboarding'
-import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+"use client"
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'O nome do cartão é obrigatório' }),
-  bank: z.string().min(1, { message: 'O banco emissor do cartão é obrigatório' }),
-  last_digits: z.string().length(4, { message: 'Os últimos 4 dígitos do cartão são obrigatórios' })
-    .regex(/^\d{4}$/, { message: 'Os últimos dígitos devem conter apenas números' }),
-  conversion_rate: z.number().optional(),
-  annual_fee: z.number().nullable().optional(),
-  active: z.boolean().default(true),
-  reward_program_id: z.string().optional(),
-})
+import { useState, useEffect } from "react"
+import { onboardingService } from "@/services/onboarding-service"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { CreditCard, AlertCircle } from "lucide-react"
 
-type CreateCardFormValues = z.infer<typeof formSchema>
-
-interface CreateCardStepProps {
-  setActiveStep: (step: number) => void
+interface CreateCardFormData {
+  name: string
+  bank: string
+  last_digits: string
+  conversion_rate: number
+  annual_fee: number | null
+  active: boolean
+  reward_program_id?: string
 }
 
-export default function CreateCardStep({ setActiveStep }: CreateCardStepProps) {
-  const { createCard } = useOnboarding()
+interface CreateCardStepProps {
+  onDataChange: (data: CreateCardFormData | null) => void
+}
+
+export default function CreateCardStep({ onDataChange }: CreateCardStepProps) {
   const [banks, setBanks] = useState<string[]>([])
-
-  useEffect(() => {
-    // Carregar bancos
-    onboardingService.getBanks().then(response => {
-      setBanks(response.data)
-    })
-  }, [])
-
-  const form = useForm<CreateCardFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      bank: '',
-      last_digits: '',
-      conversion_rate: 1,
-      annual_fee: 0,
-      active: true,
-    }
+  const [loading, setLoading] = useState(true)
+  const [formData, setFormData] = useState<CreateCardFormData>({
+    name: "",
+    bank: "",
+    last_digits: "",
+    conversion_rate: 1,
+    annual_fee: 0,
+    active: true,
+    reward_program_id: "",
   })
 
-  const onSubmit = (data: CreateCardFormValues) => {
-    // Montar objeto para envio da API
-    const cardData = {
-      ...data,
-      reward_programs: data.reward_program_id ? [{
-        reward_program_id: data.reward_program_id,
-        is_primary: true
-      }] : undefined
-    }
+  const [errors, setErrors] = useState({
+    name: false,
+    bank: false,
+    last_digits: false,
+  })
 
-    // Remover campo extra do form que não é usado na API
-    delete (cardData as any).reward_program_id
+  useEffect(() => {
+    setLoading(true)
+    onboardingService
+      .getBanks()
+      .then((response) => {
+        setBanks(response.data)
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar bancos:", error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
 
-    createCard.mutate(cardData, {
-      onSuccess: () => {
-        setActiveStep(1) // Avançar para o próximo passo
-      }
+  useEffect(() => {
+    // Validate data before sending to parent
+    const nameValid = formData.name.length >= 2
+    const bankValid = formData.bank.length >= 1
+    const digitsValid = /^\d{4}$/.test(formData.last_digits)
+
+    setErrors({
+      name: formData.name.length > 0 && !nameValid,
+      bank: formData.bank === "",
+      last_digits: formData.last_digits.length > 0 && !digitsValid,
     })
+
+    const isValid = nameValid && bankValid && digitsValid
+
+    if (isValid) {
+      onDataChange(formData)
+    } else {
+      onDataChange(null)
+    }
+  }, [formData, onDataChange])
+
+  const handleChange = <K extends keyof CreateCardFormData>(field: K, value: CreateCardFormData[K]): void => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Cartão</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Nubank Platinum" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <div className="space-y-6 w-full">
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="font-medium">
+              Nome do Cartão
+            </Label>
+            <Input
+              id="name"
+              placeholder="Ex: Nubank Platinum"
+              value={formData.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              className={errors.name ? "border-destructive" : ""}
             />
-            
-            <FormField
-              control={form.control}
-              name="bank"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Banco Emissor</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o banco" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {banks.map(bank => (
-                        <SelectItem key={bank} value={bank}>
-                          {bank}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {errors.name && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle className="h-3 w-3" /> O nome do cartão deve ter pelo menos 2 caracteres
+              </p>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="last_digits"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Últimos 4 dígitos</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: 1234" maxLength={4} {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Usado para identificar seu cartão
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="space-y-2">
+            <Label htmlFor="bank" className="font-medium">
+              Banco Emissor
+            </Label>
+            <Select value={formData.bank} onValueChange={(value) => handleChange("bank", value)} disabled={loading}>
+              <SelectTrigger id="bank" className={errors.bank ? "border-destructive" : ""}>
+                <SelectValue placeholder={loading ? "Carregando bancos..." : "Selecione o banco"} />
+              </SelectTrigger>
+              <SelectContent>
+                {banks.map((bank) => (
+                  <SelectItem key={bank} value={bank}>
+                    {bank}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.bank && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle className="h-3 w-3" /> Selecione o banco emissor
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="last_digits" className="font-medium">
+              Últimos 4 dígitos
+            </Label>
+            <Input
+              id="last_digits"
+              placeholder="Ex: 1234"
+              maxLength={4}
+              value={formData.last_digits}
+              onChange={(e) => handleChange("last_digits", e.target.value)}
+              className={errors.last_digits ? "border-destructive" : ""}
             />
-            
-            <FormField
-              control={form.control}
-              name="annual_fee"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Anuidade (R$)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      placeholder="Ex: 400" 
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
-                      value={field.value !== null ? field.value : ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <p className="text-xs text-muted-foreground">Usado para identificar seu cartão</p>
+            {errors.last_digits && (
+              <p className="text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> Digite os 4 últimos dígitos do cartão
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="annual_fee" className="font-medium">
+              Anuidade (R$)
+            </Label>
+            <Input
+              id="annual_fee"
+              type="number"
+              placeholder="Ex: 400"
+              value={formData.annual_fee !== null ? formData.annual_fee : ""}
+              onChange={(e) => handleChange("annual_fee", e.target.value ? Number.parseFloat(e.target.value) : null)}
             />
           </div>
-          
-          <FormField
-            control={form.control}
-            name="conversion_rate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Taxa de Conversão</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01"
-                    placeholder="Ex: 1.2" 
-                    onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                    value={field.value !== undefined ? field.value : ''}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Quantos pontos você ganha por cada R$ 1,00 gasto
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="conversion_rate" className="font-medium">
+            Taxa de Conversão
+          </Label>
+          <Input
+            id="conversion_rate"
+            type="number"
+            step="0.01"
+            placeholder="Ex: 1.2"
+            value={formData.conversion_rate !== undefined ? formData.conversion_rate : ""}
+            onChange={(e) => handleChange("conversion_rate", e.target.value ? Number.parseFloat(e.target.value) : 1)}
           />
-          
-          <FormField
-            control={form.control}
-            name="active"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <FormLabel>Cartão Ativo</FormLabel>
-                  <FormDescription>
-                    Desative caso não esteja mais usando este cartão
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
+          <p className="text-xs text-muted-foreground">Quantos pontos você ganha por cada R$ 1,00 gasto</p>
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
+          <div className="space-y-0.5">
+            <Label htmlFor="active" className="font-medium">
+              Cartão Ativo
+            </Label>
+            <p className="text-sm text-muted-foreground">Desative caso não esteja mais usando este cartão</p>
+          </div>
+          <Switch
+            id="active"
+            checked={formData.active}
+            onCheckedChange={(checked) => handleChange("active", checked)}
           />
         </div>
-        
-        <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            size="lg"
-            disabled={createCard.isPending}
-          >
-            {createCard.isPending ? 'Salvando...' : 'Continuar'}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      </div>
+    </div>
   )
 }

@@ -1,241 +1,193 @@
-import { useState, useRef } from 'react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { format } from 'date-fns'
-import { pt } from 'date-fns/locale'
-import { FileUpIcon, FileTextIcon, CalendarIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useOnboarding } from '@/hooks/use-onboarding'
-import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { Card, CardContent } from '@/components/ui/card'
+"use client"
 
-const formSchema = z.object({
-  invoice_file: z.instanceof(File, { message: 'O arquivo da fatura é obrigatório' })
-    .refine(file => file.size <= 10 * 1024 * 1024, {
-      message: 'O arquivo deve ter no máximo 10MB',
-    })
-    .refine(file => {
-      const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/csv'];
-      return validTypes.includes(file.type);
-    }, {
-      message: 'O arquivo deve ser PDF, JPG, PNG ou CSV',
-    }),
-  reference_date: z.date({
-    required_error: 'A data de referência é obrigatória',
-  }),
-});
+import type React from "react"
 
-type UploadInvoiceFormValues = z.infer<typeof formSchema>
+import { useState, useRef, useEffect } from "react"
+import { format } from "date-fns"
+import { pt } from "date-fns/locale"
+import { FileUpIcon, FileTextIcon, CalendarIcon, AlertCircle, FileIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-interface UploadInvoiceStepProps {
-  setActiveStep: (step: number) => void
-  cardId: string | null
+interface InvoiceData {
+  invoice_file: File
+  reference_date: string
 }
 
-export default function UploadInvoiceStep({ setActiveStep, cardId }: UploadInvoiceStepProps) {
-  const { uploadInvoice } = useOnboarding()
-  const [dragActive, setDragActive] = useState(false)
+interface UploadInvoiceStepProps {
+  onDataChange: (data: InvoiceData | null) => void
+}
+
+export default function UploadInvoiceStep({ onDataChange }: UploadInvoiceStepProps) {
+  const [dragActive, setDragActive] = useState<boolean>(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [referenceDate, setReferenceDate] = useState<Date>(new Date())
+  const [error, setError] = useState<string>("")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const form = useForm<UploadInvoiceFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      reference_date: new Date(),
-    }
-  })
-
-  const onSubmit = (data: UploadInvoiceFormValues) => {
-    if (!cardId) {
-      form.setError('root', { 
-        message: 'Não foi possível identificar o cartão. Por favor, tente novamente.' 
+  useEffect(() => {
+    if (selectedFile && referenceDate) {
+      onDataChange({
+        invoice_file: selectedFile,
+        reference_date: format(referenceDate, "yyyy-MM-dd"),
       })
-      return
+    } else {
+      onDataChange(null)
     }
+  }, [selectedFile, referenceDate, onDataChange])
 
-    uploadInvoice.mutate({
-      invoice_file: data.invoice_file,
-      card_id: cardId,
-      reference_date: format(data.reference_date, 'yyyy-MM-dd')
-    }, {
-      onSuccess: () => {
-        setActiveStep(2) // Avançar para o próximo passo
-      }
-    })
-  }
-
-  const handleDrag = (e: React.DragEvent) => {
+  const handleDrag = (e: React.DragEvent): void => {
     e.preventDefault()
     e.stopPropagation()
-    
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true)
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false)
     }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent): void => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      form.setValue('invoice_file', e.dataTransfer.files[0], { 
-        shouldValidate: true,
-        shouldDirty: true
-      })
+      validateAndSetFile(e.dataTransfer.files[0])
     }
   }
 
-  const selectedFile = form.watch('invoice_file')
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (e.target.files?.[0]) {
+      validateAndSetFile(e.target.files[0])
+    }
+  }
+
+  const validateAndSetFile = (file: File): void => {
+    // Validate size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("O arquivo deve ter no máximo 10MB")
+      return
+    }
+
+    // Validate type
+    const validTypes = ["application/pdf", "image/jpeg", "image/png", "text/csv"]
+    if (!validTypes.includes(file.type)) {
+      setError("O arquivo deve ser PDF, JPG, PNG ou CSV")
+      return
+    }
+
+    setError("")
+    setSelectedFile(file)
+  }
+
+  const getFileIcon = () => {
+    if (!selectedFile) return <FileUpIcon size={40} className="text-muted-foreground" />
+
+    switch (selectedFile.type) {
+      case "application/pdf":
+        return <FileTextIcon size={40} className="text-primary" />
+      case "image/jpeg":
+      case "image/png":
+        return <FileIcon size={40} className="text-primary" />
+      case "text/csv":
+        return <FileTextIcon size={40} className="text-primary" />
+      default:
+        return <FileIcon size={40} className="text-primary" />
+    }
+  }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="invoice_file"
-            render={({ field: { value, onChange, ...fieldProps } }) => (
-              <FormItem>
-                <FormLabel>Fatura do Cartão</FormLabel>
-                <FormControl>
-                  <div 
-                    className={cn(
-                      "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
-                      dragActive ? "border-primary bg-primary/5" : "border-gray-300 hover:border-primary",
-                      "flex flex-col items-center justify-center"
-                    )}
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Input
-                      type="file"
-                      ref={fileInputRef}
-                      accept=".pdf,.jpg,.jpeg,.png,.csv"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) {
-                          onChange(e.target.files[0])
-                        }
-                      }}
-                      {...fieldProps}
-                    />
-                    
-                    {value ? (
-                      <div className="flex flex-col items-center gap-2">
-                        <FileTextIcon size={40} className="text-primary" />
-                        <p className="font-medium">{value.name}</p>
-                        <p className="text-sm text-muted-foreground">{(value.size / 1024).toFixed(2)} KB</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <FileUpIcon size={40} className="text-muted-foreground" />
-                        <p className="font-medium">Arraste e solte sua fatura aqui</p>
-                        <p className="text-sm text-muted-foreground">ou clique para selecionar um arquivo</p>
-                        <p className="text-xs text-muted-foreground mt-2">Formatos aceitos: PDF, JPG, PNG, CSV</p>
-                      </div>
-                    )}
-                  </div>
-                </FormControl>
-                <FormDescription>
-                  Envie a fatura completa para melhor análise de gastos (10MB max)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+    <div className="space-y-6 w-full">
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label className="font-medium">Fatura do Cartão</Label>
+          <div
+            className={cn(
+              "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
+              dragActive ? "border-primary bg-primary/5" : "border-gray-300 hover:border-primary",
+              "flex flex-col items-center justify-center h-48",
             )}
-          />
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Input
+              type="file"
+              ref={fileInputRef}
+              accept=".pdf,.jpg,.jpeg,.png,.csv"
+              className="hidden"
+              onChange={handleFileChange}
+            />
 
-          <FormField
-            control={form.control}
-            name="reference_date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Mês de Referência</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "MMMM 'de' yyyy", { locale: pt })
-                        ) : (
-                          <span>Selecione o mês/ano da fatura</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="default"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date > new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Mês/ano de referência da fatura
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+            {selectedFile ? (
+              <div className="flex flex-col items-center gap-3">
+                {getFileIcon()}
+                <div>
+                  <p className="font-medium text-primary">{selectedFile.name}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-3">
+                <FileUpIcon size={40} className="text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Arraste e solte sua fatura aqui</p>
+                  <p className="text-sm text-muted-foreground mt-1">ou clique para selecionar um arquivo</p>
+                </div>
+              </div>
             )}
-          />
+          </div>
+          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
+            <span>Formatos aceitos: PDF, JPG, PNG, CSV (10MB max)</span>
+          </p>
         </div>
 
-        {form.formState.errors.root && (
-          <Card className="border-destructive bg-destructive/10">
-            <CardContent className="p-4 text-destructive">
-              {form.formState.errors.root.message}
-            </CardContent>
-          </Card>
-        )}
-        
-        <div className="flex justify-between">
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => setActiveStep(0)}
-          >
-            Voltar
-          </Button>
-          
-          <Button 
-            type="submit" 
-            size="lg"
-            disabled={uploadInvoice.isPending || !selectedFile}
-          >
-            {uploadInvoice.isPending ? 'Enviando...' : 'Continuar'}
-          </Button>
+        <div className="space-y-2">
+          <Label className="font-medium">Mês de Referência</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn("w-full pl-3 text-left font-normal", !referenceDate && "text-muted-foreground")}
+              >
+                {referenceDate ? (
+                  format(referenceDate, "MMMM 'de' yyyy", { locale: pt })
+                ) : (
+                  <span>Selecione o mês/ano da fatura</span>
+                )}
+                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={referenceDate}
+                onSelect={(date) => date && setReferenceDate(date)}
+                disabled={(date) => date > new Date()}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <p className="text-xs text-muted-foreground">Mês/ano de referência da fatura</p>
         </div>
-      </form>
-    </Form>
+      </div>
+
+      {error && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+    </div>
   )
 }

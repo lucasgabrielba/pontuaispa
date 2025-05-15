@@ -38,11 +38,11 @@ const formSchema = z.object({
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const { userCards } = useOnboarding()
+  const { userHasCards } = useOnboarding()
 
   // Pre-carrega os cartões para o estado inicial
   useEffect(() => {
-    userCards.refetch()
+    userHasCards.refetch()
   }, [])
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,14 +57,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     login.mutate(data, {
       onSuccess: async () => {
         try {
-          // Verificar se o usuário tem cartões
-          await userCards.refetch()
-          
-          // Se não tiver cartões, redirecionar para o onboarding
-          if (!userCards.data || !userCards.data.cards || userCards.data.cards.length === 0) {
-            navigate({ to: '/onboarding' })
-          } else {
+          await userHasCards.refetch()
+
+          if (userHasCards.data) {
             navigate({ to: '/' })
+          } else {
+            navigate({ to: '/onboarding' })
           }
         } catch (error) {
           console.error("Erro ao verificar cartões do usuário:", error)
