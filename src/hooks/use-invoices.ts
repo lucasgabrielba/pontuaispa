@@ -20,7 +20,7 @@ export const useInvoices = () => {
     refetch: refetchHistory
   } = useQuery<InvoiceHistoryItem[]>({
     queryKey: ['invoices-history'],
-    queryFn: () => invoicesService.getInvoicesHistory().then(res => res.data.data)
+    queryFn: () => invoicesService.listInvoices().then(res => res.data.data)
   })
 
   // Mutação para fazer upload de fatura
