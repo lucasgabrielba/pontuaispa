@@ -1,3 +1,4 @@
+// src/features/cartoes/components/card-form-drawer.tsx
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import type { Card } from "@/types/cards"
@@ -30,6 +31,13 @@ export function CardFormDrawer({
     onSubmit(data);
   };
 
+  const handleButtonClick = () => {
+    // Aciona o método de submissão exposto pelo componente CardForm
+    if (window.submitCardForm) {
+      window.submitCardForm();
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-[500px] overflow-y-auto">
@@ -56,7 +64,11 @@ export function CardFormDrawer({
           <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button type="submit" form="card-form" disabled={isSubmitting}>
+          <Button 
+            type="button" 
+            onClick={handleButtonClick} 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (card ? "Salvando..." : "Adicionando...") : card ? "Salvar" : "Adicionar Cartão"}
           </Button>
         </SheetFooter>

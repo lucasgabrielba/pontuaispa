@@ -2,12 +2,12 @@ export interface Card {
   id: string; // ULID
   name: string;
   bank: string;
-  lastDigits: string;
-  rewardProgramId: string;
-  rewardProgramName: string;
-  conversionRate: number;
-  annualFee: number | null;
-  isActive: boolean;
+  last_digits: string;
+  reward_program_id: string;
+  reward_program_name: string;
+  conversion_rate: number;
+  annual_fee: number | null;
+  is_active: boolean;
 }
 
 export interface RewardProgram {
@@ -22,6 +22,6 @@ export interface RecommendedCard {
   bank: string;
   description: string;
   benefits: string;
-  rewardProgramName: string;
-  potentialIncrease: number;
+  reward_programName: string;
+  potential_increase: number;
 }

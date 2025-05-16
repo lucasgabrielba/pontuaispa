@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+// src/features/cartoes/components/card-form.tsx
+import { useEffect, useRef } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,7 +23,7 @@ interface CardFormData {
   id: string
   name: string
   bank: string
-  lastDigits: string
+  last_digits: string
   rewardProgramId: string
   conversionRate: number
   annualFee: string // String no form, convertido para number ou null
@@ -38,10 +39,8 @@ export function CardForm({
   onSubmit,
   isSubmitting,
 }: CardFormProps) {
-  console.log(
-    'rewardPrograms',
-    rewardPrograms,
-  );
+  const formRef = useRef<HTMLFormElement>(null);
+  
   const {
     register,
     handleSubmit,
@@ -53,25 +52,25 @@ export function CardForm({
       id: "",
       name: "",
       bank: "",
-      lastDigits: "",
+      last_digits: "",
       rewardProgramId: "",
       conversionRate: 1.0,
       annualFee: "",
       isActive: true,
     },
   })
-  console.log(isSubmitting);
+
   // Reset form quando o cartão mudar
   useEffect(() => {
     reset({
       id: card?.id || "",
       name: card?.name || "",
       bank: card?.bank || "",
-      lastDigits: card?.lastDigits || "",
-      rewardProgramId: card?.rewardProgramId || "",
-      conversionRate: card?.conversionRate || 1.0,
-      annualFee: card?.annualFee?.toString() || "",
-      isActive: card?.isActive ?? true,
+      last_digits: card?.last_digits || "",
+      reward_program_id: card?.reward_program_id || "",
+      conversion_rate: card?.conversion_rate || 1.0,
+      annual_fee: card?.annual_fee?.toString() || "",
+      is_active: card?.is_active ?? true,
     })
   }, [card, reset])
 
@@ -81,13 +80,28 @@ export function CardForm({
 
     onSubmit({
       ...data,
-      conversionRate: Number(data.conversionRate),
-      annualFee,
+      conversion_rate: Number(data.conversionRate),
+      annual_fee: annualFee,
     })
   })
 
+  // Expor método para submeter o formulário externamente
+  useEffect(() => {
+    // Define um método global para acessar a submissão do formulário
+    window.submitCardForm = () => {
+      formRef.current?.dispatchEvent(
+        new Event('submit', { cancelable: true, bubbles: true })
+      );
+    };
+    
+    return () => {
+      // Limpa o método global quando o componente é desmontado
+      delete window.submitCardForm;
+    };
+  }, []);
+
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-6">
+    <form id="card-form" ref={formRef} onSubmit={handleFormSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="name" className="font-medium">
@@ -143,26 +157,26 @@ export function CardForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="lastDigits" className="font-medium">
+          <Label htmlFor="last_digits" className="font-medium">
             Últimos 4 dígitos
           </Label>
           <Input
-            id="lastDigits"
+            id="last_digits"
             placeholder="Ex: 1234"
             maxLength={4}
-            {...register("lastDigits", {
+            {...register("last_digits", {
               required: "Últimos dígitos são obrigatórios",
               pattern: {
                 value: /^[0-9]{4}$/,
                 message: "Digite os 4 últimos dígitos do cartão",
               },
             })}
-            className={errors.lastDigits ? "border-destructive" : ""}
+            className={errors.last_digits ? "border-destructive" : ""}
           />
           <p className="text-xs text-muted-foreground">Usado para identificar seu cartão</p>
-          {errors.lastDigits && (
+          {errors.last_digits && (
             <p className="text-xs text-destructive flex items-center gap-1">
-              <AlertCircle className="h-3 w-3" /> {errors.lastDigits.message}
+              <AlertCircle className="h-3 w-3" /> {errors.last_digits.message}
             </p>
           )}
         </div>
@@ -262,4 +276,10 @@ export function CardForm({
       </div>
     </form>
   )
+}
+
+declare global {
+  interface Window {
+    submitCardForm?: () => void;
+  }
 }

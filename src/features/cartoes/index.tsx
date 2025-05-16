@@ -245,10 +245,10 @@ function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
         <span className="font-medium">Vantagens:</span> {card.benefits}
       </div>
       <div className="text-sm">
-        <span className="font-medium">Programa:</span> {card.rewardProgramName}
+        <span className="font-medium">Programa:</span> {card.reward_programName}
       </div>
       <div className="mt-auto pt-4 flex justify-between items-center">
-        <div className="text-primary font-semibold">{card.potentialIncrease}% mais pontos</div>
+        <div className="text-primary font-semibold">{card.potential_increase}% mais pontos</div>
         <Button variant="outline" size="sm">
           Detalhes
         </Button>
