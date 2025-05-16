@@ -1,3 +1,4 @@
+// src/features/faturas/upload/index.tsx
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { Header } from "@/components/layout/header"
@@ -23,6 +24,7 @@ import { useCards } from "@/hooks/use-cards"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { IconAlertCircle } from "@tabler/icons-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Invoice } from '@/types'
 
 export default function FaturasUpload() {
   const {
@@ -47,22 +49,41 @@ export default function FaturasUpload() {
     handleDrop,
     handleFileChange,
     handleSubmitInvoice,
-    clearForm
+    clearForm,
+    refetchHistory
   } = useInvoices()
+
 
   // Obtendo a lista de cartões para o select
   const { cards, isLoadingCards } = useCards()
+  
+  // Função para formatar a data
+  function formatDate(dateString: string) {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: pt })
+    } catch (e) {
+      console.error('Erro ao formatar a data:', e)
+      return dateString
+    }
+  }
+  
+  // Função para obter nome do cartão
+  function getCardName(cardId: string) {
+    if (!cards) return cardId.substring(0, 8)
+    const card = cards.find(c => c.id === cardId)
+    return card ? `${card.name} (${card.last_digits})` : cardId.substring(0, 8)
+  }
 
   function getStatusVariant(status: string) {
     switch (status) {
       case 'Analisado':
         return 'default'
-      case 'Em análise':
+      case 'Processando':
         return 'secondary'
-      case 'Pendente':
-        return 'outline'
+      case 'Erro':
+        return 'destructive'
       default:
-        return 'secondary'
+        return 'outline'
     }
   }
 
@@ -94,7 +115,12 @@ export default function FaturasUpload() {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value)
+          if (value === 'historico') {
+            refetchHistory()
+          }
+        }} className="space-y-4">
           <TabsList>
             <TabsTrigger value="upload">Upload de Fatura</TabsTrigger>
             <TabsTrigger value="historico">Histórico de Faturas</TabsTrigger>
@@ -275,7 +301,7 @@ export default function FaturasUpload() {
                     <Skeleton className="h-10 w-full" />
                     <Skeleton className="h-10 w-full" />
                   </div>
-                ) : invoicesHistory && invoicesHistory.length > 0 ? (
+                ) : invoicesHistory && invoicesHistory.data && invoicesHistory.data.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -288,17 +314,17 @@ export default function FaturasUpload() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {invoicesHistory.map((fatura) => (
-                        <TableRow key={fatura.id}>
-                          <TableCell>{fatura.dataEnvio}</TableCell>
-                          <TableCell>{fatura.cartao}</TableCell>
-                          <TableCell>{fatura.mesReferencia}</TableCell>
+                      {invoicesHistory.data.map((invoice: Invoice) => (
+                        <TableRow key={invoice.id}>
+                          <TableCell>{formatDate(invoice.created_at!)}</TableCell>
+                          <TableCell>{getCardName(invoice.card_id)}</TableCell>
+                          <TableCell>{formatDate(invoice.reference_date)}</TableCell>
                           <TableCell>
-                            <Badge variant={getStatusVariant(fatura.status)}>
-                              {fatura.status}
+                            <Badge variant={getStatusVariant(invoice.status)}>
+                              {invoice.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>R$ {fatura.valor}</TableCell>
+                          <TableCell>R$ {invoice.total_amount ? invoice.total_amount.toFixed(2) : "0.00"}</TableCell>
                           <TableCell className="text-right">
                             <Button variant="ghost" size="sm">
                               Ver Detalhes

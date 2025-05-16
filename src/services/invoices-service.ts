@@ -6,14 +6,6 @@ export interface InvoiceFormData {
   reference_date: string
 }
 
-export interface InvoiceHistoryItem {
-  id: number
-  dataEnvio: string
-  cartao: string
-  mesReferencia: string
-  status: string
-  valor: string
-}
 
 export const invoicesService = {
   // Upload de fatura
@@ -30,7 +22,6 @@ export const invoicesService = {
     })
   },
 
-  // Obtém o histórico de faturas
   listInvoices: () => api.get('/invoices'),
 
   // Detalhes de uma fatura específica

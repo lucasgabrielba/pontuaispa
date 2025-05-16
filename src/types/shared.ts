@@ -16,12 +16,6 @@ export interface Address {
   deleted_at?: string | null;
 }
 
-export interface ApiErrorResponse {
-  success: boolean;
-  message: string;
-  errors?: Record<string, string[]>;
-}
-
 // Paginação
 export interface PaginatedResponse<T> {
   data: T[];

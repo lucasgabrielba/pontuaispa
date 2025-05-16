@@ -1,8 +1,15 @@
+// src/hooks/use-invoices.ts
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
-import { invoicesService, InvoiceHistoryItem, InvoiceFormData } from '@/services/invoices-service'
+import { invoicesService } from '@/services/invoices-service'
+
+export interface InvoiceFormData {
+  invoice_file: File
+  card_id: string
+  reference_date: string
+}
 
 export const useInvoices = () => {
   const queryClient = useQueryClient()
@@ -18,9 +25,10 @@ export const useInvoices = () => {
     isLoading: isLoadingHistory,
     error: historyError,
     refetch: refetchHistory
-  } = useQuery<InvoiceHistoryItem[]>({
+  } = useQuery({
     queryKey: ['invoices-history'],
-    queryFn: () => invoicesService.listInvoices().then(res => res.data.data)
+    queryFn: () => invoicesService.listInvoices().then(res => res.data),
+    enabled: activeTab === 'historico'
   })
 
   // Mutação para fazer upload de fatura
