@@ -6,6 +6,8 @@ import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import SkipToMain from '@/components/skip-to-main'
 import { useAuthGuard } from '@/utils/auth-guard'
+import LineDotLoader from '@/components/line-dot-loader'
+
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async () => {
@@ -20,12 +22,7 @@ function RouteComponent() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="relative">
-          <div className="h-12 w-12 rounded-full border-2 border-t-blue-900 border-r-transparent border-b-blue-900 border-l-transparent animate-spin"></div>
-          <div className="mt-4 text-sm text-gray-600 font-medium">Carregando</div>
-        </div>
-      </div>
+      <LineDotLoader/>
     )
   }
 

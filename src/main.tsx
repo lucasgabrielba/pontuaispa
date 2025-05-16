@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error) => {
-        // eslint-disable-next-line no-console
+         
         if (import.meta.env.DEV) console.log({ failureCount, error })
 
         if (failureCount >= 0 && import.meta.env.DEV) return false
@@ -42,7 +42,7 @@ const queryClient = new QueryClient({
           if (error.response?.status === 304) {
             toast({
               variant: 'destructive',
-              title: 'Content not modified!',
+              title: 'Conteúdo não modificado!',
             })
           }
         }
@@ -55,7 +55,7 @@ const queryClient = new QueryClient({
         if (error.response?.status === 401) {
           toast({
             variant: 'destructive',
-            title: 'Session expired!',
+            title: 'Sessão expirada!',
           })
           useAuthStore.getState().auth.reset()
           const redirect = `${router.history.location.href}`
@@ -64,7 +64,7 @@ const queryClient = new QueryClient({
         if (error.response?.status === 500) {
           toast({
             variant: 'destructive',
-            title: 'Internal Server Error!',
+            title: 'Erro interno no servidor!',
           })
           router.navigate({ to: '/500' })
         }

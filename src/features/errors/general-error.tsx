@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 interface GeneralErrorProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -9,7 +9,7 @@ export default function GeneralError({
   minimal = false,
 }: GeneralErrorProps) {
   const navigate = useNavigate()
-  const { history } = useRouter()
+
   return (
     <div className={cn('h-svh w-full', className)}>
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
@@ -22,7 +22,7 @@ export default function GeneralError({
         </p>
         {!minimal && (
           <div className='mt-6 flex gap-4'>
-            <Button variant='outline' onClick={() => history.go(-1)}>
+            <Button variant='outline' onClick={() => window.location.reload()}>
               Voltar
             </Button>
             <Button onClick={() => navigate({ to: '/' })}>Voltar para Início</Button>

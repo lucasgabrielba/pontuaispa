@@ -1,13 +1,13 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
+// import { ChevronDownIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fonts } from '@/config/fonts'
-import { cn } from '@/lib/utils'
+// import { cn } from '@/lib/utils'
 import { useFont } from '@/context/font-context'
 import { useTheme } from '@/context/theme-context'
 import { toast } from '@/hooks/use-toast'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -63,7 +63,7 @@ export function AppearanceForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
+        {/* <FormField
           control={form.control}
           name='font'
           render={({ field }) => (
@@ -93,7 +93,7 @@ export function AppearanceForm() {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name='theme'

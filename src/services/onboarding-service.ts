@@ -78,8 +78,4 @@ export const onboardingService = {
   getBanks: () => {
     return Promise.resolve({ data: mockBanks })
   },
-
-  getMockRewardPrograms: () => {
-    return Promise.resolve({ data: mockRewardPrograms })
-  }
 }

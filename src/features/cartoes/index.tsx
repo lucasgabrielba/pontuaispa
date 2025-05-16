@@ -1,5 +1,3 @@
-"use client"
-
 import { Header } from "@/components/layout/header"
 import { Main } from "@/components/layout/main"
 import { ProfileDropdown } from "@/components/profile-dropdown"
@@ -32,9 +30,11 @@ export default function CardsPage() {
     cards,
     recommendedCards,
     rewardPrograms,
+    banks,
     isLoadingCards,
     isLoadingRecommendedCards,
     isLoadingRewardPrograms,
+    isLoadingBanks,
     isCardFormDialogOpen,
     setIsCardFormDialogOpen,
     isDeleteDialogOpen,
@@ -171,6 +171,8 @@ export default function CardsPage() {
           open={isCardFormDialogOpen}
           onOpenChange={setIsCardFormDialogOpen}
           card={cardToEdit}
+          banks={banks || []}             
+          isLoadingBanks={isLoadingBanks} 
           rewardPrograms={rewardPrograms || []}
           isLoadingRewardPrograms={isLoadingRewardPrograms}
           onSubmit={handleSubmitCardForm}
@@ -247,9 +249,6 @@ function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
       </div>
       <div className="mt-auto pt-4 flex justify-between items-center">
         <div className="text-primary font-semibold">{card.potentialIncrease}% mais pontos</div>
-        <Button variant="outline" size="sm">
-          Detalhes
-        </Button>
         <Button variant="outline" size="sm">
           Detalhes
         </Button>
