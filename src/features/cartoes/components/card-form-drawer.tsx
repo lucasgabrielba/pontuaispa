@@ -1,16 +1,16 @@
 // src/features/cartoes/components/card-form-drawer.tsx
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import type { Card } from "@/types/cards"
 import { CardForm } from "./card-form"
+import { Bank, Card } from "@/types"
 
 interface CardFormDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   card?: Card | null
-  banks?: string[]
+  banks?: Bank[]
   isLoadingBanks: boolean
-  rewardPrograms: Array<{ id: string; name: string }>
+  rewardPrograms?: Array<{ id: string; name: string }>
   isLoadingRewardPrograms: boolean
   onSubmit: (data: Omit<Card, "reward_program_name">) => void
   isSubmitting: boolean

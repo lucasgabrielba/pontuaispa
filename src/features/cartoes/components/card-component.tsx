@@ -22,7 +22,7 @@ export function CardComponent({ card, onStatusChange, onDeleteClick, onEditClick
   };
 
   return (
-    <CardUI className={`transition-all duration-200 ${!isActive ? "opacity-70 bg-gray-50" : "bg-white"} hover:shadow-md`}>
+    <CardUI className={`transition-all duration-200 ${!isActive ? "opacity-55 " : ""} hover:shadow-md`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
@@ -33,7 +33,7 @@ export function CardComponent({ card, onStatusChange, onDeleteClick, onEditClick
           </div>
           <Badge 
             variant="outline" 
-            className="px-2 py-1 bg-slate-50 font-medium"
+            className="px-2 py-1 bg-popover-50 font-medium"
           >
             {card.bank}
           </Badge>
@@ -42,8 +42,8 @@ export function CardComponent({ card, onStatusChange, onDeleteClick, onEditClick
       
       <CardContent className="space-y-3 pt-2">
         <div className="grid grid-cols-2 gap-y-2 text-sm">
-          <span className="text-muted-foreground">Programa:</span>
-          <span className="text-right font-medium">{card.reward_program_name || "Sem programa"}</span>
+          {/* <span className="text-muted-foreground">Programa:</span> */}
+          {/* <span className="text-right font-medium">{card.reward_program_name || "Sem programa"}</span> */}
           
           <span className="text-muted-foreground">Taxa de conversão:</span>
           <span className="text-right font-medium">R$ 1 = {card.conversion_rate} pontos</span>
@@ -69,7 +69,7 @@ export function CardComponent({ card, onStatusChange, onDeleteClick, onEditClick
               variant="ghost"
               size="sm"
               onClick={() => onEditClick(card)}
-              className="h-8 w-8 p-0 rounded-full hover:bg-slate-100"
+              className="h-8 w-8 p-0 rounded-full hover:bg-popover-100"
             >
               <IconPencil className="h-4 w-4" />
             </Button>
@@ -77,7 +77,7 @@ export function CardComponent({ card, onStatusChange, onDeleteClick, onEditClick
               variant="ghost"
               size="sm"
               onClick={() => onDeleteClick(card.id)}
-              className="h-8 w-8 p-0 rounded-full hover:bg-slate-100"
+              className="h-8 w-8 p-0 rounded-full hover:bg-popover-100"
             >
               <IconTrash className="h-4 w-4 text-destructive" />
             </Button>

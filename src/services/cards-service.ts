@@ -18,7 +18,7 @@ export const cardsService = {
 
   // Atualizar status do cartão
   updateCardStatus: (id: string, isActive: boolean) =>
-    api.patch(`/cards/${id}/status`, { isActive }),
+    api.put(`/cards/${id}/status`, { isActive }),
 
   // Deletar cartão
   deleteCard: (id: string) => api.delete(`/cards/${id}`),

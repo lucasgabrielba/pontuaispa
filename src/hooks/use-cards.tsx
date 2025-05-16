@@ -3,6 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { cardsService } from '@/services/cards-service'
 import type { Card, RecommendedCard, RewardProgram } from '@/types/cards'
+import { Bank } from '@/types'
+import { ToastAction } from '@/components/ui/toast'
+import { useNavigate } from '@tanstack/react-router'
 
 export function useCards() {
   const queryClient = useQueryClient()
@@ -10,6 +13,7 @@ export function useCards() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [cardToEdit, setCardToEdit] = useState<Card | null>(null)
   const [cardToDelete, setCardToDelete] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   // Query para buscar cartões
   const {
@@ -45,21 +49,23 @@ export function useCards() {
   const {
     data: banks,
     isLoading: isLoadingBanks
-  } = useQuery<string[]>({
+  } = useQuery<Bank[]>({
     queryKey: ['banks'],
     queryFn: () => cardsService.getBanks().then(res => res.data.data)
   })
 
   // Mutação para adicionar cartão
   const addCardMutation = useMutation({
-    mutationFn: (data: Omit<Card, 'id' | 'reward_program_name'>) => 
+    mutationFn: (data: Omit<Card, 'id' | 'reward_program_name'>) =>
       cardsService.addCard(data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cards'] })
       setIsCardFormDialogOpen(false)
       toast({
         title: 'Cartão adicionado com sucesso',
-        description: 'O cartão foi cadastrado e está pronto para uso'
+        description: 'O cartão foi cadastrado e está pronto para uso',
+        action:
+          <ToastAction altText="Adicionar Fatura" onClick={() => { navigate({ to: '/faturas' }) }}>Adicionar fatura</ToastAction>
       })
     },
     onError: (error: any) => {
@@ -73,7 +79,7 @@ export function useCards() {
 
   // Mutação para editar cartão
   const updateCardMutation = useMutation({
-    mutationFn: (data: Card) => 
+    mutationFn: (data: Card) =>
       cardsService.updateCard(data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cards'] })
@@ -81,7 +87,9 @@ export function useCards() {
       setCardToEdit(null)
       toast({
         title: 'Cartão atualizado com sucesso',
-        description: 'Os dados do cartão foram atualizados'
+        description: 'Os dados do cartão foram atualizados',
+        action:
+          <ToastAction altText="Adicionar Fatura" onClick={() => { navigate({ to: '/faturas' }) }}>Adicionar fatura</ToastAction>
       })
     },
     onError: (error: any) => {
@@ -95,7 +103,7 @@ export function useCards() {
 
   // Mutação para atualizar status do cartão (ativo/inativo)
   const updateCardStatusMutation = useMutation({
-    mutationFn: ({ id, isActive }: { id: string, isActive: boolean }) => 
+    mutationFn: ({ id, isActive }: { id: string, isActive: boolean }) =>
       cardsService.updateCardStatus(id, isActive).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cards'] })
@@ -150,10 +158,10 @@ export function useCards() {
   const handleSubmitCardForm = (cardData: Omit<Card, 'reward_program_name'>) => {
     if (cardData.id) {
       // Para edição
-      const rewardProgram = rewardPrograms?.find(p => p.id === cardData.reward_program_id)
+      // const rewardProgram = rewardPrograms?.find(p => p.id === cardData.reward_program_id)
       const fullCardData: Card = {
         ...cardData,
-        reward_program_name: rewardProgram?.name || 'Sem programa'
+        // reward_program_name: rewardProgram?.name || 'Sem programa'
       }
       updateCardMutation.mutate(fullCardData)
     } else {
@@ -186,27 +194,27 @@ export function useCards() {
     recommendedCards,
     rewardPrograms,
     banks,
-    
+
     // Estados de loading
     isLoadingCards,
     isLoadingRecommendedCards,
     isLoadingRewardPrograms,
     isLoadingBanks,
-    
+
     // Erros
     cardsError,
     recommendedCardsError,
-    
+
     // Estados do dialog
     isCardFormDialogOpen,
     setIsCardFormDialogOpen,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
-    
+
     // Estados de edição
     cardToEdit,
     cardToDelete,
-    
+
     // Handlers
     handleOpenAddCardForm,
     handleOpenEditCardForm,
@@ -215,7 +223,7 @@ export function useCards() {
     handleConfirmDeleteCard,
     handleOpenDeleteDialog,
     refetchCards,
-    
+
     // Estados de operações
     isSubmitting: addCardMutation.isPending || updateCardMutation.isPending,
     isUpdating: updateCardStatusMutation.isPending,

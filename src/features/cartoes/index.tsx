@@ -171,9 +171,9 @@ export default function CardsPage() {
           open={isCardFormDialogOpen}
           onOpenChange={setIsCardFormDialogOpen}
           card={cardToEdit}
-          banks={banks || []}             
+          banks={banks}             
           isLoadingBanks={isLoadingBanks} 
-          rewardPrograms={rewardPrograms || []}
+          rewardPrograms={rewardPrograms}
           isLoadingRewardPrograms={isLoadingRewardPrograms}
           onSubmit={handleSubmitCardForm}
           isSubmitting={isSubmitting}
@@ -244,9 +244,9 @@ function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
       <div className="text-sm mb-2">
         <span className="font-medium">Vantagens:</span> {card.benefits}
       </div>
-      <div className="text-sm">
+      {/* <div className="text-sm">
         <span className="font-medium">Programa:</span> {card.reward_program_name}
-      </div>
+      </div> */}
       <div className="mt-auto pt-4 flex justify-between items-center">
         <div className="text-primary font-semibold">{card.potential_increase}% mais pontos</div>
         <Button variant="outline" size="sm">

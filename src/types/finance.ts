@@ -65,3 +65,16 @@ export interface InvoiceProcessorResult {
   due_date?: string;
   closing_date?: string;
 }
+
+export interface Bank {
+  id: string;
+  code: string;
+  created_at: string;
+  description: string;
+  is_active: string;
+  logo_url: string;
+  name: string;
+  primary_color: string;
+  secondary_color: string;
+  updated_at: string;
+}

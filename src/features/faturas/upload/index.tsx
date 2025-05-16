@@ -74,7 +74,6 @@ export default function FaturasUpload() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="upload">Upload de Fatura</TabsTrigger>
-            <TabsTrigger value="cartoes">Configurar Cartões</TabsTrigger>
             <TabsTrigger value="historico">Histórico de Faturas</TabsTrigger>
           </TabsList>
           
@@ -161,22 +160,6 @@ export default function FaturasUpload() {
                     <h3 className="text-sm font-semibold">Formatos Aceitos</h3>
                     <p className="text-xs text-muted-foreground mt-1">PDF, imagens de PDF, fotos da fatura (JPG/PNG)</p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="cartoes">
-            <Card>
-              <CardHeader>
-                <CardTitle>Configurar Cartões</CardTitle>
-                <CardDescription>
-                  Adicione e gerencie seus cartões para melhorar as recomendações.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-32 items-center justify-center text-muted-foreground">
-                  Componente de gerenciamento de cartões será implementado aqui
                 </div>
               </CardContent>
             </Card>

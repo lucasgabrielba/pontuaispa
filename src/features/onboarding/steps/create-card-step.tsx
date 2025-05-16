@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { AlertCircle } from "lucide-react"
+import { Bank } from "@/types"
 
 interface CreateCardFormData {
   name: string
@@ -21,7 +22,7 @@ interface CreateCardStepProps {
 }
 
 export default function CreateCardStep({ onDataChange }: CreateCardStepProps) {
-  const [banks, setBanks] = useState<string[]>([])
+  const [banks, setBanks] = useState<Bank[]>([])
   const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState<CreateCardFormData>({
     name: "",
@@ -114,8 +115,8 @@ export default function CreateCardStep({ onDataChange }: CreateCardStepProps) {
               </SelectTrigger>
               <SelectContent>
                 {banks.map((bank) => (
-                  <SelectItem key={bank} value={bank}>
-                    {bank}
+                  <SelectItem key={bank.name} value={bank.name}>
+                    {bank.name}
                   </SelectItem>
                 ))}
               </SelectContent>

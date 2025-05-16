@@ -1,4 +1,3 @@
-// src/features/cartoes/components/card-form.tsx
 import { useEffect, useRef } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { Input } from "@/components/ui/input"
@@ -8,12 +7,13 @@ import { Switch } from "@/components/ui/switch"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle } from "lucide-react"
 import type { Card } from "@/types/cards"
+import { Bank } from "@/types"
 
 interface CardFormProps {
   card?: Card | null
-  banks?: string[]
+  banks?: Bank[]
   isLoadingBanks: boolean
-  rewardPrograms: Array<{ id: string; name: string }>
+  rewardPrograms?: Array<{ id: string; name: string }>
   isLoadingRewardPrograms: boolean
   onSubmit: (data: Omit<Card, "reward_program_name">) => void
   isSubmitting: boolean
@@ -32,12 +32,12 @@ interface CardFormData {
 
 export function CardForm({
   card,
-  banks = [],
+  banks,
   isLoadingBanks,
-  rewardPrograms,
-  isLoadingRewardPrograms,
+  // rewardPrograms,
+  // isLoadingRewardPrograms,
   onSubmit,
-  isSubmitting,
+  // isSubmitting,
 }: CardFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   
@@ -46,6 +46,7 @@ export function CardForm({
     handleSubmit,
     reset,
     control,
+    setValue,
     formState: { errors },
   } = useForm<CardFormData>({
     defaultValues: {
@@ -60,19 +61,30 @@ export function CardForm({
     },
   })
 
+  // Atualiza explicitamente o campo bank quando o card muda
+  useEffect(() => {
+    if (card && card.bank) {
+      setValue('bank', card.bank);
+    }
+  }, [card, setValue]);
+
   // Reset form quando o cartão mudar
   useEffect(() => {
-    reset({
-      id: card?.id || "",
-      name: card?.name || "",
-      bank: card?.bank || "",
-      last_digits: card?.last_digits || "",
-      reward_program_id: card?.reward_program_id || "",
-      conversion_rate: card?.conversion_rate || 1.0,
-      annual_fee: card?.annual_fee?.toString() || "",
-      active: card?.active ?? true,
-    })
-  }, [card, reset])
+    if (card) {      
+      setTimeout(() => {
+        reset({
+          id: card.id || "",
+          name: card.name || "",
+          bank: card.bank || "",
+          last_digits: card.last_digits || "",
+          // reward_program_id: card.reward_program_id || "",
+          conversion_rate: card.conversion_rate || 1.0,
+          annual_fee: card.annual_fee?.toString() || "",
+          active: card.active ?? true,
+        }, { keepDefaultValues: false });
+      }, 50);
+    }
+  }, [card, reset]);
 
   const handleFormSubmit = handleSubmit((data) => {
     // Converter annualFee de string para number ou null
@@ -120,7 +132,7 @@ export function CardForm({
           )}
         </div>
 
-        <div className="space-y-2">
+          <div className="space-y-2">
           <Label htmlFor="bank" className="font-medium">
             Banco Emissor
           </Label>
@@ -131,20 +143,29 @@ export function CardForm({
               name="bank"
               control={control}
               rules={{ required: "Banco é obrigatório" }}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="bank" className={errors.bank ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Selecione o banco" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {banks.map((bank) => (
-                      <SelectItem key={bank} value={bank}>
-                        {bank}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+              render={({ field }) => {
+                if (card?.bank && !field.value) {
+                  field.value = card.bank;
+                }
+                return (
+                  <Select 
+                    value={field.value} 
+                    onValueChange={field.onChange}
+                    defaultValue={card?.bank || ""}
+                  >
+                    <SelectTrigger id="bank" className={errors.bank ? "border-destructive" : ""}>
+                      <SelectValue placeholder="Selecione o banco" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {banks?.map((bank) => (
+                        <SelectItem key={bank.name} value={bank.name}>
+                          {bank.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                );
+              }}
             />
           )}
           {errors.bank && (
@@ -205,7 +226,7 @@ export function CardForm({
         </div>
       </div>
 
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <Label htmlFor="reward_program_id" className="font-medium">
           Programa de Pontos
         </Label>
@@ -231,7 +252,7 @@ export function CardForm({
             )}
           />
         )}
-      </div>
+      </div> */}
 
       <div className="space-y-2">
         <Label htmlFor="conversion_rate" className="font-medium">
