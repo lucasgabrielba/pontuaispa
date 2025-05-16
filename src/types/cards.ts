@@ -1,23 +1,43 @@
+import { Invoice } from "./finance";
+import { Point } from "./rewards";
+
 export interface Card {
-  id: string; // ULID
+  id: string;
+  user_id: string;
   name: string;
   bank: string;
   last_digits: string;
-  reward_program_id: string;
-  reward_program_name: string;
   conversion_rate: number;
   annual_fee: number | null;
-  is_active: boolean;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+  rewardPrograms?: RewardProgram[];
+  invoices?: Invoice[];
 }
 
 export interface RewardProgram {
-  id: string; // ULID
+  id: string;
   name: string;
-  description?: string;
+  code: string;
+  description?: string | null;
+  website?: string | null;
+  logo_path?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+  pivot?: {
+    conversion_rate: number;
+    is_primary: boolean;
+    terms?: string | null;
+  };
+  cards?: Card[];
+  points?: Point[];
 }
 
 export interface RecommendedCard {
-  id: string; // ULID
+  id: string;
   name: string;
   bank: string;
   description: string;

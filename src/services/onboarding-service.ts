@@ -14,7 +14,7 @@ export interface CardCreateRequest {
   last_digits: string
   conversion_rate?: number
   annual_fee?: number | null
-  active?: boolean
+  active?: boolean 
   reward_programs?: CardRewardProgram[]
 }
 
@@ -23,26 +23,6 @@ export interface InvoiceUploadRequest {
   card_id: string
   reference_date?: string
 }
-
-// Simular resposta da API para desenvolvimento
-const mockBanks = [
-  "Nubank", 
-  "Itaú", 
-  "Banco do Brasil", 
-  "Bradesco", 
-  "Santander", 
-  "Caixa", 
-  "Banco Inter", 
-  "C6 Bank"
-]
-
-const mockRewardPrograms = [
-  { id: "1", name: "Livelo", description: "Programa multi-parceiros", image_url: "" },
-  { id: "2", name: "Smiles", description: "Programa de fidelidade da Gol", image_url: "" },
-  { id: "3", name: "Esfera", description: "Programa de fidelidade do Santander", image_url: "" },
-  { id: "4", name: "TudoAzul", description: "Programa de fidelidade da Azul", image_url: "" },
-  { id: "5", name: "Dotz", description: "Programa multi-parceiros", image_url: "" },
-]
 
 export const onboardingService = {
   // Verificar se o usuário tem cartões
@@ -74,8 +54,5 @@ export const onboardingService = {
     })
   },
 
-  // Métodos para desenvolvimento/mock
-  getBanks: () => {
-    return Promise.resolve({ data: mockBanks })
-  },
+  getBanks: () => api.get('/banks')
 }

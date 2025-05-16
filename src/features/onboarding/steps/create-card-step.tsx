@@ -12,7 +12,7 @@ interface CreateCardFormData {
   last_digits: string
   conversion_rate: number
   annual_fee: number | null
-  active: boolean
+  active: boolean 
   reward_program_id?: string
 }
 
@@ -44,7 +44,7 @@ export default function CreateCardStep({ onDataChange }: CreateCardStepProps) {
     onboardingService
       .getBanks()
       .then((response) => {
-        setBanks(response.data)
+        setBanks(response.data.data)
       })
       .catch((error) => {
         console.error("Erro ao carregar bancos:", error)

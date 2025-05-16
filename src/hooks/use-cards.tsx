@@ -47,12 +47,12 @@ export function useCards() {
     isLoading: isLoadingBanks
   } = useQuery<string[]>({
     queryKey: ['banks'],
-    queryFn: () => cardsService.getBanks().then(res => res.data)
+    queryFn: () => cardsService.getBanks().then(res => res.data.data)
   })
 
   // Mutação para adicionar cartão
   const addCardMutation = useMutation({
-    mutationFn: (data: Omit<Card, 'id' | 'rewardProgramName'>) => 
+    mutationFn: (data: Omit<Card, 'id' | 'reward_program_name'>) => 
       cardsService.addCard(data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cards'] })
@@ -147,13 +147,13 @@ export function useCards() {
   }
 
   // Handler para submeter formulário (adicionar ou editar)
-  const handleSubmitCardForm = (cardData: Omit<Card, 'rewardProgramName'>) => {
+  const handleSubmitCardForm = (cardData: Omit<Card, 'reward_program_name'>) => {
     if (cardData.id) {
       // Para edição
-      const rewardProgram = rewardPrograms?.find(p => p.id === cardData.rewardProgramId)
+      const rewardProgram = rewardPrograms?.find(p => p.id === cardData.reward_program_id)
       const fullCardData: Card = {
         ...cardData,
-        rewardProgramName: rewardProgram?.name || 'Sem programa'
+        reward_program_name: rewardProgram?.name || 'Sem programa'
       }
       updateCardMutation.mutate(fullCardData)
     } else {

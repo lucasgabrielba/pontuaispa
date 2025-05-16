@@ -15,7 +15,7 @@ interface CardFormProps {
   isLoadingBanks: boolean
   rewardPrograms: Array<{ id: string; name: string }>
   isLoadingRewardPrograms: boolean
-  onSubmit: (data: Omit<Card, "rewardProgramName">) => void
+  onSubmit: (data: Omit<Card, "reward_program_name">) => void
   isSubmitting: boolean
 }
 
@@ -24,10 +24,10 @@ interface CardFormData {
   name: string
   bank: string
   last_digits: string
-  rewardProgramId: string
-  conversionRate: number
-  annualFee: string // String no form, convertido para number ou null
-  isActive: boolean
+  reward_program_id: string
+  conversion_rate: number
+  annual_fee: string // String no form, convertido para number ou null
+  active: boolean
 }
 
 export function CardForm({
@@ -53,10 +53,10 @@ export function CardForm({
       name: "",
       bank: "",
       last_digits: "",
-      rewardProgramId: "",
-      conversionRate: 1.0,
-      annualFee: "",
-      isActive: true,
+      reward_program_id: "",
+      conversion_rate: 1.0,
+      annual_fee: "",
+      active: true,
     },
   })
 
@@ -70,17 +70,17 @@ export function CardForm({
       reward_program_id: card?.reward_program_id || "",
       conversion_rate: card?.conversion_rate || 1.0,
       annual_fee: card?.annual_fee?.toString() || "",
-      is_active: card?.is_active ?? true,
+      active: card?.active ?? true,
     })
   }, [card, reset])
 
   const handleFormSubmit = handleSubmit((data) => {
     // Converter annualFee de string para number ou null
-    const annualFee = data.annualFee === "" ? null : Number(data.annualFee)
+    const annualFee = data.annual_fee === "" ? null : Number(data.annual_fee)
 
     onSubmit({
       ...data,
-      conversion_rate: Number(data.conversionRate),
+      conversion_rate: Number(data.conversion_rate),
       annual_fee: annualFee,
     })
   })
@@ -182,42 +182,42 @@ export function CardForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="annualFee" className="font-medium">
+          <Label htmlFor="annual_fee" className="font-medium">
             Anuidade (R$)
           </Label>
           <Input
-            id="annualFee"
+            id="annual_fee"
             type="number"
             placeholder="Ex: 400 (deixe vazio para gratuito)"
-            {...register("annualFee", {
+            {...register("annual_fee", {
               min: {
                 value: 0,
                 message: "Valor não pode ser negativo",
               },
             })}
-            className={errors.annualFee ? "border-destructive" : ""}
+            className={errors.annual_fee ? "border-destructive" : ""}
           />
-          {errors.annualFee && (
+          {errors.annual_fee && (
             <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-              <AlertCircle className="h-3 w-3" /> {errors.annualFee.message}
+              <AlertCircle className="h-3 w-3" /> {errors.annual_fee.message}
             </p>
           )}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="rewardProgramId" className="font-medium">
+        <Label htmlFor="reward_program_id" className="font-medium">
           Programa de Pontos
         </Label>
         {isLoadingRewardPrograms ? (
           <Skeleton className="h-10 w-full" />
         ) : (
           <Controller
-            name="rewardProgramId"
+            name="reward_program_id"
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="rewardProgramId">
+                <SelectTrigger id="reward_program_id">
                   <SelectValue placeholder="Selecione o programa de pontos" />
                 </SelectTrigger>
                 <SelectContent>
@@ -234,43 +234,43 @@ export function CardForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="conversionRate" className="font-medium">
+        <Label htmlFor="conversion_rate" className="font-medium">
           Taxa de Conversão
         </Label>
         <Input
-          id="conversionRate"
+          id="conversion_rate"
           type="number"
           step="0.01"
           placeholder="Ex: 1.2"
-          {...register("conversionRate", {
+          {...register("conversion_rate", {
             required: "Taxa de conversão é obrigatória",
             min: {
               value: 0.1,
               message: "Taxa deve ser maior que 0.1",
             },
           })}
-          className={errors.conversionRate ? "border-destructive" : ""}
+          className={errors.conversion_rate ? "border-destructive" : ""}
         />
         <p className="text-xs text-muted-foreground">Quantos pontos você ganha por cada R$ 1,00 gasto</p>
-        {errors.conversionRate && (
+        {errors.conversion_rate && (
           <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-            <AlertCircle className="h-3 w-3" /> {errors.conversionRate.message}
+            <AlertCircle className="h-3 w-3" /> {errors.conversion_rate.message}
           </p>
         )}
       </div>
 
       <div className="flex items-center justify-between rounded-lg border p-4 shadow-sm">
         <div className="space-y-0.5">
-          <Label htmlFor="isActive" className="font-medium">
+          <Label htmlFor="active" className="font-medium">
             Cartão Ativo
           </Label>
           <p className="text-sm text-muted-foreground">Desative caso não esteja mais usando este cartão</p>
         </div>
         <Controller
-          name="isActive"
+          name="active"
           control={control}
           render={({ field }) => (
-            <Switch id="isActive" checked={field.value} onCheckedChange={field.onChange} />
+            <Switch id="active" checked={field.value} onCheckedChange={field.onChange} />
           )}
         />
       </div>

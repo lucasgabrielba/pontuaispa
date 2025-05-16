@@ -12,7 +12,7 @@ interface CardFormDrawerProps {
   isLoadingBanks: boolean
   rewardPrograms: Array<{ id: string; name: string }>
   isLoadingRewardPrograms: boolean
-  onSubmit: (data: Omit<Card, "rewardProgramName">) => void
+  onSubmit: (data: Omit<Card, "reward_program_name">) => void
   isSubmitting: boolean
 }
 
@@ -27,7 +27,7 @@ export function CardFormDrawer({
   onSubmit,
   isSubmitting,
 }: CardFormDrawerProps) {
-  const handleFormSubmit = (data: Omit<Card, "rewardProgramName">) => {
+  const handleFormSubmit = (data: Omit<Card, "reward_program_name">) => {
     onSubmit(data);
   };
 

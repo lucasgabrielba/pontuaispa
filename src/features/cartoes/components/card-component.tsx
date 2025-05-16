@@ -14,7 +14,7 @@ interface CardComponentProps {
 }
 
 export function CardComponent({ card, onStatusChange, onDeleteClick, onEditClick }: CardComponentProps) {
-  const [isActive, setIsActive] = useState(card.is_active);
+  const [isActive, setIsActive] = useState(card.active);
   
   const handleStatusChange = (checked: boolean) => {
     setIsActive(checked);

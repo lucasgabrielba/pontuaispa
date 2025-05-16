@@ -245,7 +245,7 @@ function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
         <span className="font-medium">Vantagens:</span> {card.benefits}
       </div>
       <div className="text-sm">
-        <span className="font-medium">Programa:</span> {card.reward_programName}
+        <span className="font-medium">Programa:</span> {card.reward_program_name}
       </div>
       <div className="mt-auto pt-4 flex justify-between items-center">
         <div className="text-primary font-semibold">{card.potential_increase}% mais pontos</div>
