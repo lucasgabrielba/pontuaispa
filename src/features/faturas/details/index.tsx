@@ -17,20 +17,31 @@ import { IconAlertCircle } from "@tabler/icons-react"
 import { useInvoiceDetails } from '@/hooks/use-invoice-details'
 import { CategoryIcon } from '@/components/category-icon'
 import { TransactionsList } from './components/transactions-list'
+import { useMemo } from 'react'
 
 export function InvoiceDetails() {
   const params = useParams({ from: '/_authenticated/faturas/$invoiceId' })
   const navigate = useNavigate()
   const invoiceId = params.invoiceId
-  
-  const { 
-    invoice, 
-    transactions, 
-    isLoading, 
-    error, 
+
+  const {
+    invoice,
+    transactions,
+    isLoading,
+    error,
     cardName,
-    summaryByCategory 
+    summaryByCategory,
+    params: filterParams,
+    updateParams
   } = useInvoiceDetails(invoiceId)
+
+  // Extrair categorias únicas do resumo por categoria para o filtro
+  const categories = useMemo(() => {
+    return summaryByCategory.map(category => ({
+      id: category.id || 'uncategorized',
+      name: category.name
+    }));
+  }, [summaryByCategory]);
 
   // Função para formatar a data
   function formatDate(dateString?: string) {
@@ -59,17 +70,34 @@ export function InvoiceDetails() {
 
   // Cálculo de totais
   const totalAmount = invoice?.total_amount || 0
-  const totalPoints = transactions?.reduce((sum, tx) => sum + (tx.points_earned || 0), 0) || 0
-  const avgPointsPerTransaction = transactions?.length 
-    ? (totalPoints / transactions.length).toFixed(1) 
+  const totalPoints = transactions?.data?.reduce((sum: any, tx: any) => sum + (tx.points_earned || 0), 0) || 0
+  const avgPointsPerTransaction = transactions?.data?.length
+    ? (totalPoints / transactions.data.length).toFixed(1)
     : '0'
+
+  // Manipuladores para os filtros e paginação
+  const handlePaginationChange = (page: number) => {
+    updateParams({ page });
+  };
+
+  const handleSearchChange = (search: string) => {
+    updateParams({ search, page: 1 });
+  };
+
+  const handleSortChange = (field: 'date' | 'amount' | 'merchant', order: 'asc' | 'desc') => {
+    updateParams({ sortField: field, sortOrder: order });
+  };
+
+  const handleCategoryFilterChange = (category: string) => {
+    updateParams({ categoryFilter: category, page: 1 });
+  };
 
   return (
     <>
       <Header>
         <div className='flex items-center gap-2'>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="gap-2"
             onClick={() => navigate({ to: "/faturas" })}
           >
@@ -128,7 +156,6 @@ export function InvoiceDetails() {
                 </Button>
               </div>
             </div>
-
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
               <Card>
                 <CardHeader className="pb-2">
@@ -154,7 +181,7 @@ export function InvoiceDetails() {
                     R$ {totalAmount.toFixed(2)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {transactions?.length || 0} transações
+                    {transactions?.total || 0} transações
                   </p>
                 </CardContent>
               </Card>
@@ -198,7 +225,19 @@ export function InvoiceDetails() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <TransactionsList transactions={transactions || []} />
+                  {transactions && (
+                    <TransactionsList
+                      transactions={transactions}
+                      onPaginationChange={handlePaginationChange}
+                      onSearchChange={handleSearchChange}
+                      onSortChange={handleSortChange}
+                      onCategoryFilterChange={handleCategoryFilterChange}
+                      sortField={filterParams.sortField || 'date'}
+                      sortOrder={filterParams.sortOrder || 'desc'}
+                      categoryFilter={filterParams.categoryFilter || 'all'}
+                      categories={categories}
+                    />
+                  )}
                 </CardContent>
               </Card>
 
@@ -217,12 +256,12 @@ export function InvoiceDetails() {
                       </div>
                     ) : (
                       summaryByCategory?.map((category) => (
-                        <div key={category.id} className="space-y-2">
+                        <div key={category.id || 'uncategorized'} className="space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <CategoryIcon 
-                                iconName={category.icon || 'help-circle'} 
-                                color={category.color || 'gray'} 
+                              <CategoryIcon
+                                iconName={category.icon || 'help-circle'}
+                                color={category.color || 'gray'}
                                 size={16}
                               />
                               <span className="font-medium">{category.name}</span>
@@ -232,9 +271,9 @@ export function InvoiceDetails() {
                             </span>
                           </div>
                           <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-primary rounded-full" 
-                              style={{ 
+                            <div
+                              className="h-full bg-primary rounded-full"
+                              style={{
                                 width: `${(category.total / totalAmount) * 100}%`,
                                 backgroundColor: category.color ? `hsl(var(--${category.color}))` : undefined
                               }}
@@ -260,7 +299,7 @@ export function InvoiceDetails() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {transactions && transactions.some(tx => tx.is_recommended) ? (
+                {transactions && transactions.data.some((tx: any) => tx.is_recommended) ? (
                   <div className="space-y-4">
                     <Alert>
                       <IconAlertCircle className="h-4 w-4" />
@@ -268,7 +307,7 @@ export function InvoiceDetails() {
                         Você poderia ter acumulado até <strong>30% mais pontos</strong> usando cartões mais adequados para suas categorias de gastos.
                       </AlertDescription>
                     </Alert>
-                    
+
                     <div className="space-y-2">
                       <p className="font-medium">Recomendações:</p>
                       <ul className="list-disc pl-5 space-y-1">

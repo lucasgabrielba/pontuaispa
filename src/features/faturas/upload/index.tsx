@@ -25,6 +25,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { IconAlertCircle } from "@tabler/icons-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Invoice } from '@/types'
+import { useNavigate } from '@tanstack/react-router'
 
 export default function FaturasUpload() {
   const {
@@ -38,11 +39,11 @@ export default function FaturasUpload() {
     selectedCardId,
     setSelectedCardId,
     invoicesHistory,
-    
+
     // Estados de loading
     isLoadingHistory,
     isUploading,
-    
+
     // Handlers
     handleDragOver,
     handleDragLeave,
@@ -53,10 +54,11 @@ export default function FaturasUpload() {
     refetchHistory
   } = useInvoices()
 
+  const navigate = useNavigate()
 
   // Obtendo a lista de cartões para o select
   const { cards, isLoadingCards } = useCards()
-  
+
   // Função para formatar a data
   function formatDate(dateString: string) {
     try {
@@ -66,7 +68,7 @@ export default function FaturasUpload() {
       return dateString
     }
   }
-  
+
   // Função para obter nome do cartão
   function getCardName(cardId: string) {
     if (!cards) return cardId.substring(0, 8)
@@ -91,8 +93,8 @@ export default function FaturasUpload() {
     <>
       <Header>
         <div className='flex items-center gap-2'>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="gap-2"
             onClick={() => window.location.href = "/"}
           >
@@ -125,7 +127,7 @@ export default function FaturasUpload() {
             <TabsTrigger value="upload">Upload de Fatura</TabsTrigger>
             <TabsTrigger value="historico">Histórico de Faturas</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="upload" className="space-y-4">
             <Card>
               <CardHeader>
@@ -135,10 +137,9 @@ export default function FaturasUpload() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div 
-                  className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
-                    isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'
-                  }`}
+                <div
+                  className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'
+                    }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
@@ -161,11 +162,11 @@ export default function FaturasUpload() {
                       </>
                     )}
                   </div>
-                  <input 
-                    id="file-upload" 
-                    type="file" 
-                    className="hidden" 
-                    accept=".pdf,.jpg,.jpeg,.png,.csv" 
+                  <input
+                    id="file-upload"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,.csv"
                     onChange={handleFileChange}
                   />
                 </div>
@@ -176,8 +177,8 @@ export default function FaturasUpload() {
                     {isLoadingCards ? (
                       <Skeleton className="h-9 w-full" />
                     ) : cards && cards.length > 0 ? (
-                      <Select 
-                        value={selectedCardId} 
+                      <Select
+                        value={selectedCardId}
                         onValueChange={setSelectedCardId}
                       >
                         <SelectTrigger id="cartao">
@@ -236,14 +237,14 @@ export default function FaturasUpload() {
                 <Separator />
 
                 <div className="flex justify-end gap-2">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={clearForm}
                     disabled={isUploading || !selectedFile}
                   >
                     Limpar
                   </Button>
-                  <Button 
+                  <Button
                     onClick={handleSubmitInvoice}
                     disabled={isUploading || !selectedFile || !selectedCardId || !referenceDate}
                   >
@@ -259,7 +260,7 @@ export default function FaturasUpload() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Dicas para Envio de Faturas</CardTitle>
@@ -285,7 +286,7 @@ export default function FaturasUpload() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="historico">
             <Card>
               <CardHeader>
@@ -326,7 +327,7 @@ export default function FaturasUpload() {
                           </TableCell>
                           <TableCell>R$ {invoice.total_amount ? invoice.total_amount.toFixed(2) : "0.00"}</TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => { navigate({ to: '/faturas/$invoiceId', params: { invoiceId: invoice?.id } }) }}>
                               Ver Detalhes
                             </Button>
                           </TableCell>

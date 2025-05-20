@@ -1,3 +1,4 @@
+// src/services/invoices-service.ts
 import api from '@/lib/api'
 
 export interface InvoiceFormData {
@@ -6,6 +7,14 @@ export interface InvoiceFormData {
   reference_date: string
 }
 
+export interface InvoiceDetailsParams {
+  page?: number;
+  per_page?: number;
+  search?: string;
+  sort_field?: string;
+  sort_order?: string;
+  category_filter?: string;
+}
 
 export const invoicesService = {
   // Upload de fatura
@@ -22,13 +31,12 @@ export const invoicesService = {
     })
   },
 
-  getInvoiceDetails: (id: string) => api.get(`/invoices/${id}`),
+  getInvoiceDetails: (id: string, params: InvoiceDetailsParams = {}) => {
+    return api.get(`/invoices/${id}`, { params });
+  },
 
   listInvoices: () => api.get('/invoices'),
 
-  // Detalhes de uma fatura específica
-  getInvoice: (id: number) => api.get(`/invoices/${id}`),
-  
   // Obtém as categorias das transações para uso em filtros
   listCategories: () => {
     const categories = [

@@ -1,5 +1,4 @@
-// src/features/faturas/details/components/transactions-list.tsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { 
@@ -26,64 +25,54 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { IconSearch, IconFilter, IconArrowUp, IconArrowDown, IconStar } from "@tabler/icons-react"
 import { Transaction } from '@/types'
+import { Pagination } from '@/components/pagination'
 
 interface TransactionsListProps {
-  transactions: Transaction[]
+  transactions: {
+    data: Transaction[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+  onPaginationChange: (page: number) => void;
+  onSearchChange: (search: string) => void;
+  onSortChange: (field: 'date' | 'amount' | 'merchant', order: 'asc' | 'desc') => void;
+  onCategoryFilterChange: (category: string) => void;
+  sortField: 'date' | 'amount' | 'merchant';
+  sortOrder: 'asc' | 'desc';
+  categoryFilter: string;
+  categories: { id: string; name: string }[];
 }
 
-export function TransactionsList({ transactions }: TransactionsListProps) {
+export function TransactionsList({ 
+  transactions, 
+  onPaginationChange,
+  onSearchChange,
+  onSortChange,
+  onCategoryFilterChange,
+  sortField,
+  sortOrder,
+  categoryFilter,
+  categories
+}: TransactionsListProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortField, setSortField] = useState<'date' | 'amount' | 'merchant'>('date')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  
+  // Aplicar debounce à pesquisa
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearchChange(searchQuery);
+    }, 500);
 
-  // Extrair categorias únicas para o filtro
-  const uniqueCategories = Array.from(
-    new Set(transactions.map(tx => tx.category?.name || 'Sem categoria'))
-  ).sort()
-
-  // Filtrar e ordenar transações
-  const filteredTransactions = transactions
-    .filter(tx => {
-      // Aplicar filtro de pesquisa
-      const matchesSearch = tx.merchant_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tx.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tx.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      
-      // Aplicar filtro de categoria
-      const matchesCategory = categoryFilter === 'all' || 
-        tx.category?.name === categoryFilter ||
-        (!tx.category?.name && categoryFilter === 'Sem categoria')
-      
-      return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => {
-      // Aplicar ordenação
-      if (sortField === 'date') {
-        return sortOrder === 'asc' 
-          ? new Date(a.transaction_date).getTime() - new Date(b.transaction_date).getTime()
-          : new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime()
-      }
-      
-      if (sortField === 'amount') {
-        return sortOrder === 'asc' 
-          ? a.amount - b.amount
-          : b.amount - a.amount
-      }
-      
-      // merchant_name
-      return sortOrder === 'asc'
-        ? a.merchant_name.localeCompare(b.merchant_name)
-        : b.merchant_name.localeCompare(a.merchant_name)
-    })
+    return () => clearTimeout(timer);
+  }, [searchQuery, onSearchChange]);
 
   // Função para alternar a ordenação
   const toggleSort = (field: 'date' | 'amount' | 'merchant') => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+      onSortChange(field, sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortField(field)
-      setSortOrder('desc')
+      onSortChange(field, 'desc');
     }
   }
 
@@ -110,7 +99,7 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
           <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
         
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <IconFilter className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Todas as categorias" />
@@ -118,9 +107,10 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
           <SelectContent>
             <SelectGroup>
               <SelectItem value="all">Todas as categorias</SelectItem>
-              {uniqueCategories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
+              <SelectItem value="uncategorized">Sem categoria</SelectItem>
+              {categories.map(category => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -128,7 +118,7 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
         </Select>
       </div>
 
-      {filteredTransactions.length === 0 ? (
+      {transactions.data.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           Nenhuma transação encontrada
         </div>
@@ -187,7 +177,7 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTransactions.map((transaction) => (
+              {transactions.data.map((transaction) => (
                 <TableRow key={transaction.id} className={transaction.is_recommended ? "bg-yellow-50/50 dark:bg-yellow-900/10" : ""}>
                   <TableCell className="font-medium">
                     {formatTransactionDate(transaction.transaction_date)}
@@ -236,6 +226,16 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
               ))}
             </TableBody>
           </Table>
+          
+          {transactions.last_page > 1 && (
+            <div className="flex justify-center py-4">
+              <Pagination
+                currentPage={transactions.current_page}
+                totalPages={transactions.last_page}
+                onPageChange={onPaginationChange}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
