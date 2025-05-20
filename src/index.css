@@ -20,15 +20,18 @@
     --accent-foreground: 0 0% 100%;
     --destructive: 0 85% 60%;
     --destructive-foreground: 0 0% 100%;
+    
     --border: 0 0% 88%;
     --input: 0 0% 88%;
     --ring: 205 90% 40%;
+    
     --chart-1: 205 90% 40%;
     --chart-2: 340 95% 65%;
     --chart-3: 160 84% 45%;
     --chart-4: 35 95% 60%;
     --chart-5: 270 70% 65%;
     --radius: 0.5rem;
+    
     --sidebar-background: 200 15% 8%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 205 90% 45%;
@@ -56,14 +59,17 @@
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
+   
     --border: 200 16% 16%;
     --input: 200 16% 16%;
     --ring: 205 85% 45%;
+    
     --chart-1: 205 85% 45%;
     --chart-2: 340 90% 65%;
     --chart-3: 160 80% 50%;
     --chart-4: 35 90% 65%;
     --chart-5: 270 65% 70%;
+    
     --sidebar-background: 200 20% 6%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 205 85% 50%;
