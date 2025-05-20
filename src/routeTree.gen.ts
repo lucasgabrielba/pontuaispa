@@ -51,6 +51,9 @@ const AuthenticatedChatsIndexLazyImport = createFileRoute(
 const AuthenticatedCentralDeAjudaIndexLazyImport = createFileRoute(
   '/_authenticated/central-de-ajuda/',
 )()
+const AuthenticatedFaturasInvoiceIdLazyImport = createFileRoute(
+  '/_authenticated/faturas/$invoiceId',
+)()
 const AuthenticatedConfiguracoesNotificacoesLazyImport = createFileRoute(
   '/_authenticated/configuracoes/notificacoes',
 )()
@@ -232,6 +235,17 @@ const AuthenticatedCartoesIndexRoute = AuthenticatedCartoesIndexImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
+const AuthenticatedFaturasInvoiceIdLazyRoute =
+  AuthenticatedFaturasInvoiceIdLazyImport.update({
+    id: '/faturas/$invoiceId',
+    path: '/faturas/$invoiceId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/faturas/$invoiceId.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
 const AuthenticatedConfiguracoesNotificacoesLazyRoute =
   AuthenticatedConfiguracoesNotificacoesLazyImport.update({
     id: '/notificacoes',
@@ -388,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracoesNotificacoesLazyImport
       parentRoute: typeof AuthenticatedConfiguracoesRouteLazyImport
     }
+    '/_authenticated/faturas/$invoiceId': {
+      id: '/_authenticated/faturas/$invoiceId'
+      path: '/faturas/$invoiceId'
+      fullPath: '/faturas/$invoiceId'
+      preLoaderRoute: typeof AuthenticatedFaturasInvoiceIdLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/cartoes/': {
       id: '/_authenticated/cartoes/'
       path: '/cartoes'
@@ -469,6 +490,7 @@ const AuthenticatedConfiguracoesRouteLazyRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesRouteLazyRoute: typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedFaturasInvoiceIdLazyRoute: typeof AuthenticatedFaturasInvoiceIdLazyRoute
   AuthenticatedCartoesIndexRoute: typeof AuthenticatedCartoesIndexRoute
   AuthenticatedPontosIndexRoute: typeof AuthenticatedPontosIndexRoute
   AuthenticatedCentralDeAjudaIndexLazyRoute: typeof AuthenticatedCentralDeAjudaIndexLazyRoute
@@ -481,6 +503,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfiguracoesRouteLazyRoute:
     AuthenticatedConfiguracoesRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedFaturasInvoiceIdLazyRoute:
+    AuthenticatedFaturasInvoiceIdLazyRoute,
   AuthenticatedCartoesIndexRoute: AuthenticatedCartoesIndexRoute,
   AuthenticatedPontosIndexRoute: AuthenticatedPontosIndexRoute,
   AuthenticatedCentralDeAjudaIndexLazyRoute:
@@ -510,6 +534,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
+  '/faturas/$invoiceId': typeof AuthenticatedFaturasInvoiceIdLazyRoute
   '/cartoes': typeof AuthenticatedCartoesIndexRoute
   '/pontos': typeof AuthenticatedPontosIndexRoute
   '/central-de-ajuda': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
@@ -534,6 +559,7 @@ export interface FileRoutesByTo {
   '/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
+  '/faturas/$invoiceId': typeof AuthenticatedFaturasInvoiceIdLazyRoute
   '/cartoes': typeof AuthenticatedCartoesIndexRoute
   '/pontos': typeof AuthenticatedPontosIndexRoute
   '/central-de-ajuda': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
@@ -562,6 +588,7 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/_authenticated/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
+  '/_authenticated/faturas/$invoiceId': typeof AuthenticatedFaturasInvoiceIdLazyRoute
   '/_authenticated/cartoes/': typeof AuthenticatedCartoesIndexRoute
   '/_authenticated/pontos/': typeof AuthenticatedPontosIndexRoute
   '/_authenticated/central-de-ajuda/': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
@@ -590,6 +617,7 @@ export interface FileRouteTypes {
     | '/configuracoes/aparencia'
     | '/configuracoes/conta'
     | '/configuracoes/notificacoes'
+    | '/faturas/$invoiceId'
     | '/cartoes'
     | '/pontos'
     | '/central-de-ajuda'
@@ -613,6 +641,7 @@ export interface FileRouteTypes {
     | '/configuracoes/aparencia'
     | '/configuracoes/conta'
     | '/configuracoes/notificacoes'
+    | '/faturas/$invoiceId'
     | '/cartoes'
     | '/pontos'
     | '/central-de-ajuda'
@@ -639,6 +668,7 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes/aparencia'
     | '/_authenticated/configuracoes/conta'
     | '/_authenticated/configuracoes/notificacoes'
+    | '/_authenticated/faturas/$invoiceId'
     | '/_authenticated/cartoes/'
     | '/_authenticated/pontos/'
     | '/_authenticated/central-de-ajuda/'
@@ -708,6 +738,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/configuracoes",
         "/_authenticated/",
+        "/_authenticated/faturas/$invoiceId",
         "/_authenticated/cartoes/",
         "/_authenticated/pontos/",
         "/_authenticated/central-de-ajuda/",
@@ -774,6 +805,10 @@ export const routeTree = rootRoute
     "/_authenticated/configuracoes/notificacoes": {
       "filePath": "_authenticated/configuracoes/notificacoes.lazy.tsx",
       "parent": "/_authenticated/configuracoes"
+    },
+    "/_authenticated/faturas/$invoiceId": {
+      "filePath": "_authenticated/faturas/$invoiceId.lazy.tsx",
+      "parent": "/_authenticated"
     },
     "/_authenticated/cartoes/": {
       "filePath": "_authenticated/cartoes/index.tsx",

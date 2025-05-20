@@ -22,6 +22,8 @@ export const invoicesService = {
     })
   },
 
+  getInvoiceDetails: (id: string) => api.get(`/invoices/${id}`),
+
   listInvoices: () => api.get('/invoices'),
 
   // Detalhes de uma fatura específica
