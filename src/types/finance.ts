@@ -51,6 +51,9 @@ export interface Transaction {
   invoice?: Invoice;
   category?: Category;
   points?: Point[];
+  category_icon?: string;
+  category_color?: string;
+  category_name?: string;
 }
 
 export interface InvoiceUploadRequest {

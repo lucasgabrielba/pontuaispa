@@ -8,6 +8,9 @@ export interface Transaction {
   amount: string;
   points: number;
   isRecommended: boolean;
+  category_color: string;
+  category_icon: string;
+  category_name: string;
 }
 
 export interface DashboardStats {

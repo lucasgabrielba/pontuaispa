@@ -240,7 +240,7 @@ export default function Dashboard() {
                 <CardContent className='pl-2'>
                   <Overview 
                     data={monthlySpent.data} 
-                    isLoading={monthlySpent.isLoading || monthlySpent.isRefetching} 
+                    isLoading={monthlySpent.isLoading} 
                   />
                 </CardContent>
               </Card>
@@ -254,8 +254,8 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <RecentTransactions 
-                    data={transactions.data} 
-                    isLoading={transactions.isLoading || transactions.isRefetching} 
+                    data={transactions?.data} 
+                    isLoading={transactions?.isLoading} 
                   />
                 </CardContent>
               </Card>

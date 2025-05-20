@@ -36,6 +36,7 @@ export const useDashboard = (hasData: boolean = true) => {
       
       try {
         const response = await dashboardService.getRecentTransactions()
+        console.log(response.data);
         return response.data
       } catch (error) {
         console.error('Erro ao obter transações:', error)
