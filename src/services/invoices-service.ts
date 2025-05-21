@@ -1,4 +1,3 @@
-// src/services/invoices-service.ts
 import api from '@/lib/api'
 
 export interface InvoiceFormData {
@@ -31,8 +30,16 @@ export const invoicesService = {
     })
   },
 
-  getInvoiceDetails: (id: string, params: InvoiceDetailsParams = {}) => {
-    return api.get(`/invoices/${id}`, { params });
+  getInvoice: (id: string) => {
+    return api.get(`/invoices/${id}`);
+  },
+
+  getInvoiceTransactions: (id: string, params: InvoiceDetailsParams = {}) => {
+    return api.get(`/invoices/${id}/transactions`, { params });
+  },
+
+  getInvoiceCategorySummary: (id: string) => {
+    return api.get(`/invoices/${id}/category-summary`);
   },
 
   listInvoices: () => api.get('/invoices'),

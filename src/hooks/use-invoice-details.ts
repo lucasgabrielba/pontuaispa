@@ -1,17 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { invoicesService } from '@/services/invoices-service'
-import { Invoice } from '@/types'
-
-interface CategorySummary {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  total: number;
-  count: number;
-  points: number;
-}
 
 interface InvoiceDetailsParams {
   page?: number;
@@ -52,39 +41,66 @@ export const useInvoiceDetails = (invoiceId: string) => {
 
   // Buscar detalhes da fatura pelo ID
   const {
-    data,
-    isLoading,
-    error,
-    refetch
+    data: invoice,
+    isLoading: isLoadingInvoice,
+    error: invoiceError,
+    refetch: refetchInvoice
   } = useQuery({
-    queryKey: ['invoice-details', invoiceId, params],
-    queryFn: () => invoicesService.getInvoiceDetails(invoiceId, getApiParams()).then(res => res.data),
+    queryKey: ['invoice', invoiceId],
+    queryFn: () => invoicesService.getInvoice(invoiceId).then(res => res.data),
     enabled: !!invoiceId,
   });
 
-  // Extrair dados da resposta
-  const invoice: Invoice | undefined = data?.invoice;
-  const transactions = data?.transactions;
-  const summaryByCategory: CategorySummary[] = data?.summaryByCategory || [];
+  // Buscar transações
+  const {
+    data: transactions,
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
+    refetch: refetchTransactions
+  } = useQuery({
+    queryKey: ['invoice-transactions', invoiceId, params],
+    queryFn: () => invoicesService.getInvoiceTransactions(invoiceId, getApiParams()).then(res => res.data),
+    enabled: !!invoiceId,
+  });
 
-  // Nome formatado do cartão
+  // Buscar resumo por categoria
+  const {
+    data: summaryByCategory,
+    isLoading: isLoadingSummary,
+    error: summaryError,
+    refetch: refetchSummary
+  } = useQuery({
+    queryKey: ['invoice-category-summary', invoiceId],
+    queryFn: () => invoicesService.getInvoiceCategorySummary(invoiceId).then(res => res.data),
+    enabled: !!invoiceId,
+  });
+
   const cardName = useMemo(() => {
     if (!invoice?.card) return 'Cartão não encontrado';
     return `${invoice.card.name}`;
   }, [invoice]);
 
-  // Função para atualizar parâmetros de paginação e filtro
+  const isLoading = isLoadingInvoice || isLoadingTransactions || isLoadingSummary;
+  
+  const error = invoiceError || transactionsError || summaryError;
+
   const updateParams = useCallback((newParams: Partial<InvoiceDetailsParams>) => {
     setParams(prev => ({ ...prev, ...newParams }));
   }, []);
 
+  const refetchAll = useCallback(() => {
+    refetchInvoice();
+    refetchTransactions();
+    refetchSummary();
+  }, [refetchInvoice, refetchTransactions, refetchSummary]);
+
   return {
     invoice,
     transactions,
-    summaryByCategory,
+    summaryByCategory: summaryByCategory || [],
     isLoading,
     error,
-    refetch,
+    refetchAll,
     cardName,
     params,
     updateParams

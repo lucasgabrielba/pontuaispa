@@ -1,3 +1,4 @@
+// src/features/faturas/details/index.tsx
 import { useParams } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
@@ -37,7 +38,7 @@ export function InvoiceDetails() {
 
   // Extrair categorias únicas do resumo por categoria para o filtro
   const categories = useMemo(() => {
-    return summaryByCategory.map(category => ({
+    return summaryByCategory.map((category:any) => ({
       id: category.id || 'uncategorized',
       name: category.name
     }));
@@ -199,21 +200,6 @@ export function InvoiceDetails() {
                   </p>
                 </CardContent>
               </Card>
-
-              {/* <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Datas</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-1 space-y-2">
-                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
-                    <span className="text-muted-foreground">Vencimento:</span>
-                    <span>{formatDate(invoice?.due_date)}</span>
-                    
-                    <span className="text-muted-foreground">Fechamento:</span>
-                    <span>{formatDate(invoice?.closing_date)}</span>
-                  </div>
-                </CardContent>
-              </Card> */}
             </div>
 
             <div className="grid gap-6 md:grid-cols-3 mb-6">
@@ -255,7 +241,7 @@ export function InvoiceDetails() {
                         Nenhuma categoria disponível
                       </div>
                     ) : (
-                      summaryByCategory?.map((category) => (
+                      summaryByCategory?.map((category: any) => (
                         <div key={category.id || 'uncategorized'} className="space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+// src/features/faturas/details/components/transactions-list.tsx
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
@@ -83,6 +84,13 @@ export function TransactionsList({
     } catch (e) {
       console.log(e);
       return dateString
+    }
+  }
+
+  // Função para lidar com a mudança de página
+  const handlePageChange = (page: number) => {
+    if (onPaginationChange) {
+      onPaginationChange(page);
     }
   }
 
@@ -232,7 +240,7 @@ export function TransactionsList({
               <Pagination
                 currentPage={transactions.current_page}
                 totalPages={transactions.last_page}
-                onPageChange={onPaginationChange}
+                onPageChange={handlePageChange}
               />
             </div>
           )}
