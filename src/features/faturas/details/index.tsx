@@ -1,5 +1,5 @@
 // src/features/faturas/details/index.tsx
-import { useParams } from '@tanstack/react-router'
+import { useParams, useNavigate, useSearch } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { Header } from "@/components/layout/header"
@@ -11,41 +11,243 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { IconArrowLeft, IconFileText, IconCreditCard, IconDownload } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
-import { useNavigate } from '@tanstack/react-router'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { IconAlertCircle } from "@tabler/icons-react"
-import { useInvoiceDetails } from '@/hooks/use-invoice-details'
 import { CategoryIcon } from '@/components/category-icon'
 import { TransactionsList } from './components/transactions-list'
-import { useMemo } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { invoicesService } from '@/services/invoices-service'
+
+// Definir os parâmetros de pesquisa para a rota
+interface SearchParams {
+  page?: string;
+  search?: string;
+  sortField?: 'date' | 'amount' | 'merchant';
+  sortOrder?: 'asc' | 'desc';
+  category?: string;
+}
+
+// Função para converter valores inteiros em valores reais
+function convertIntToDecimal(intValue: number): number {
+  return intValue / 100;
+}
 
 export function InvoiceDetails() {
-  const params = useParams({ from: '/_authenticated/faturas/$invoiceId' })
-  const navigate = useNavigate()
-  const invoiceId = params.invoiceId
+  const navigate = useNavigate();
+  const params = useParams({ from: '/_authenticated/faturas/$invoiceId' });
+  const invoiceId = params.invoiceId;
+  
+  // Obter parâmetros da URL
+  const searchParams = useSearch<SearchParams>({ from: '/_authenticated/faturas/$invoiceId' });
+  
+  console.log('URL Search Params:', searchParams);
+  
+  // Estados iniciais baseados nos parâmetros da URL
+  const [filterParams, setFilterParams] = useState({
+    page: parseInt(searchParams?.page || '1'),
+    perPage: 15,
+    search: searchParams?.search || '',
+    sortField: (searchParams?.sortField || 'date') as 'date' | 'amount' | 'merchant',
+    sortOrder: (searchParams?.sortOrder || 'desc') as 'asc' | 'desc',
+    categoryFilter: searchParams?.category || 'all'
+  });
+  
+  // Atualizar os parâmetros de filtro na URL
+  const updateUrlParams = useCallback((newParams: Partial<typeof filterParams>) => {
+    const currentParams = { ...filterParams, ...newParams };
+    
+    const urlSearchParams: SearchParams = {};
+    
+    // Adicionar apenas parâmetros com valores não padrão na URL
+    if (currentParams.page !== 1) urlSearchParams.page = currentParams.page.toString();
+    if (currentParams.search) urlSearchParams.search = currentParams.search;
+    if (currentParams.sortField !== 'date') urlSearchParams.sortField = currentParams.sortField;
+    if (currentParams.sortOrder !== 'desc') urlSearchParams.sortOrder = currentParams.sortOrder;
+    if (currentParams.categoryFilter !== 'all') urlSearchParams.category = currentParams.categoryFilter;
+    
+    console.log('Atualizando URL:', urlSearchParams);
+    
+    // Navegar para a mesma rota com os novos parâmetros de consulta
+    navigate({
+      to: '/faturas/$invoiceId',
+      params: { invoiceId },
+      search: Object.keys(urlSearchParams).length > 0 ? urlSearchParams : undefined,
+      replace: true // Substituir em vez de adicionar ao histórico
+    });
+  }, [filterParams, invoiceId, navigate]);
+  
+  // Função para atualizar os parâmetros de filtro
+  const updateParams = useCallback((newParams: Partial<typeof filterParams>) => {
+    console.log('Atualizando parâmetros:', newParams);
+    
+    setFilterParams(prev => {
+      const updated = { ...prev, ...newParams };
+      console.log('Parâmetros atualizados:', updated);
+      return updated;
+    });
+    
+    // Atualizar os parâmetros na URL
+    updateUrlParams(newParams);
+  }, [updateUrlParams]);
+  
+  // Efeito para sincronizar o estado local com os parâmetros da URL quando mudam
+  useEffect(() => {
+    const page = parseInt(searchParams?.page || '1');
+    const search = searchParams?.search || '';
+    const sortField = (searchParams?.sortField || 'date') as 'date' | 'amount' | 'merchant';
+    const sortOrder = (searchParams?.sortOrder || 'desc') as 'asc' | 'desc';
+    const categoryFilter = searchParams?.category || 'all';
+    
+    // Verificar se os parâmetros da URL são diferentes dos locais
+    if (
+      page !== filterParams.page ||
+      search !== filterParams.search ||
+      sortField !== filterParams.sortField ||
+      sortOrder !== filterParams.sortOrder ||
+      categoryFilter !== filterParams.categoryFilter
+    ) {
+      console.log('Sincronizando estado com parâmetros da URL');
+      setFilterParams({
+        page,
+        perPage: 15,
+        search,
+        sortField,
+        sortOrder,
+        categoryFilter
+      });
+    }
+  }, [searchParams, filterParams]);
+
+  // Converter parâmetros para formato da API
+  const getApiParams = useCallback(() => {
+    const apiSortFields = {
+      'date': 'transaction_date',
+      'amount': 'amount',
+      'merchant': 'merchant_name'
+    };
+
+    return {
+      page: filterParams.page,
+      per_page: filterParams.perPage,
+      search: filterParams.search,
+      sort_field: apiSortFields[filterParams.sortField] || 'transaction_date',
+      sort_order: filterParams.sortOrder || 'desc',
+      category_filter: filterParams.categoryFilter || 'all'
+    };
+  }, [filterParams]);
+
+  // Consultas
+  const {
+    data: invoice,
+    isLoading: isLoadingInvoice,
+    error: invoiceError,
+  } = useQuery({
+    queryKey: ['invoice', invoiceId],
+    queryFn: () => invoicesService.getInvoice(invoiceId).then(res => res.data),
+    enabled: !!invoiceId,
+  });
+
+  // Transformação dos dados da API para o formato correto
+  const transformedInvoice = useMemo(() => {
+    if (!invoice) return null;
+    
+    return {
+      ...invoice,
+      total_amount: convertIntToDecimal(invoice.total_amount),
+    };
+  }, [invoice]);
 
   const {
-    invoice,
-    transactions,
-    isLoading,
-    error,
-    cardName,
-    summaryByCategory,
-    params: filterParams,
-    updateParams
-  } = useInvoiceDetails(invoiceId)
+    data: transactionsData,
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
+  } = useQuery({
+    queryKey: ['invoice-transactions', invoiceId, filterParams],
+    queryFn: () => {
+      const apiParams = getApiParams();
+      console.log('Executando consulta com parâmetros:', apiParams);
+      return invoicesService.getInvoiceTransactions(invoiceId, apiParams)
+        .then(res => {
+          console.log('Resposta da API:', res.data);
+          
+          // Transformar os valores inteiros em decimais
+          const transformedData = {
+            ...res.data,
+            data: res.data.data.map(tx => ({
+              ...tx,
+              amount: convertIntToDecimal(tx.amount),
+              // Se points_earned for um número inteiro, mantemos como está
+              points_earned: tx.points_earned
+            }))
+          };
+          
+          return transformedData;
+        });
+    },
+    enabled: !!invoiceId,
+  });
 
-  // Extrair categorias únicas do resumo por categoria para o filtro
+  const {
+    data: summaryByCategoryRaw,
+    isLoading: isLoadingSummary,
+    error: summaryError,
+  } = useQuery({
+    queryKey: ['invoice-category-summary', invoiceId],
+    queryFn: () => invoicesService.getInvoiceCategorySummary(invoiceId).then(res => res.data),
+    enabled: !!invoiceId,
+  });
+
+  // Transformação do resumo de categorias para valores decimais
+  const summaryByCategory = useMemo(() => {
+    if (!summaryByCategoryRaw) return null;
+    
+    return summaryByCategoryRaw.map(category => ({
+      ...category,
+      total: convertIntToDecimal(category.total)
+    }));
+  }, [summaryByCategoryRaw]);
+
+  // Cálculos memorizados
+  const cardName = useMemo(() => {
+    if (!transformedInvoice?.card) return 'Cartão não encontrado';
+    return `${transformedInvoice.card.name}`;
+  }, [transformedInvoice]);
+
   const categories = useMemo(() => {
-    return summaryByCategory.map((category:any) => ({
+    if (!summaryByCategory) return [];
+    return summaryByCategory.map((category) => ({
       id: category.id || 'uncategorized',
       name: category.name
     }));
   }, [summaryByCategory]);
 
-  // Função para formatar a data
-  function formatDate(dateString?: string) {
+  const totalAmount = useMemo(() => {
+    return transformedInvoice?.total_amount || 0;
+  }, [transformedInvoice]);
+
+  const totalPoints = useMemo(() => {
+    if (!transactionsData?.data) return 0;
+    return transactionsData.data.reduce((sum, tx) => sum + (tx.points_earned || 0), 0);
+  }, [transactionsData]);
+
+  const avgPointsPerTransaction = useMemo(() => {
+    if (!transactionsData?.data || transactionsData.data.length === 0) return '0';
+    return (totalPoints / transactionsData.data.length).toFixed(1);
+  }, [transactionsData, totalPoints]);
+
+  const hasRecommendedTransactions = useMemo(() => {
+    if (!transactionsData?.data) return false;
+    return transactionsData.data.some(tx => tx.is_recommended);
+  }, [transactionsData]);
+
+  // Estado de carregamento e erro
+  const isLoading = isLoadingInvoice || isLoadingTransactions || isLoadingSummary;
+  const error = invoiceError || transactionsError || summaryError;
+
+  // Funções de utilidade
+  function formatDate(dateString) {
     if (!dateString) return 'N/A'
     try {
       return format(new Date(dateString), 'dd/MM/yyyy', { locale: pt })
@@ -55,8 +257,7 @@ export function InvoiceDetails() {
     }
   }
 
-  // Função para obter variante do status
-  function getStatusVariant(status: string) {
+  function getStatusVariant(status) {
     switch (status) {
       case 'Analisado':
         return 'default'
@@ -69,29 +270,26 @@ export function InvoiceDetails() {
     }
   }
 
-  // Cálculo de totais
-  const totalAmount = invoice?.total_amount || 0
-  const totalPoints = transactions?.data?.reduce((sum: any, tx: any) => sum + (tx.points_earned || 0), 0) || 0
-  const avgPointsPerTransaction = transactions?.data?.length
-    ? (totalPoints / transactions.data.length).toFixed(1)
-    : '0'
-
-  // Manipuladores para os filtros e paginação
-  const handlePaginationChange = (page: number) => {
+  // Manipuladores de eventos
+  const handlePaginationChange = useCallback((page) => {
+    console.log('Solicitando mudança para página:', page);
     updateParams({ page });
-  };
+  }, [updateParams]);
 
-  const handleSearchChange = (search: string) => {
+  const handleSearchChange = useCallback((search) => {
+    console.log('Solicitando busca:', search);
     updateParams({ search, page: 1 });
-  };
+  }, [updateParams]);
 
-  const handleSortChange = (field: 'date' | 'amount' | 'merchant', order: 'asc' | 'desc') => {
+  const handleSortChange = useCallback((field, order) => {
+    console.log('Solicitando ordenação:', field, order);
     updateParams({ sortField: field, sortOrder: order });
-  };
+  }, [updateParams]);
 
-  const handleCategoryFilterChange = (category: string) => {
+  const handleCategoryFilterChange = useCallback((category) => {
+    console.log('Solicitando filtro de categoria:', category);
     updateParams({ categoryFilter: category, page: 1 });
-  };
+  }, [updateParams]);
 
   return (
     <>
@@ -141,15 +339,15 @@ export function InvoiceDetails() {
               <div>
                 <h1 className='text-2xl font-bold tracking-tight flex items-center gap-2'>
                   <IconFileText size={24} />
-                  Fatura {formatDate(invoice?.reference_date)}
+                  Fatura {formatDate(transformedInvoice?.reference_date)}
                 </h1>
                 <p className='text-muted-foreground'>
                   Detalhes da fatura e transações
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant={getStatusVariant(invoice?.status || 'Processando')}>
-                  {invoice?.status || 'Processando'}
+                <Badge variant={getStatusVariant(transformedInvoice?.status || 'Processando')}>
+                  {transformedInvoice?.status || 'Processando'}
                 </Badge>
                 <Button variant="outline" size="sm">
                   <IconDownload className="mr-2 h-4 w-4" />
@@ -168,7 +366,7 @@ export function InvoiceDetails() {
                     <span className="text-xl font-bold">{cardName}</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Final {invoice?.card?.last_digits || '****'}
+                    Final {transformedInvoice?.card?.last_digits || '****'}
                   </p>
                 </CardContent>
               </Card>
@@ -182,7 +380,7 @@ export function InvoiceDetails() {
                     R$ {totalAmount.toFixed(2)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {transactions?.total || 0} transações
+                    {transactionsData?.total || 0} transações
                   </p>
                 </CardContent>
               </Card>
@@ -211,16 +409,16 @@ export function InvoiceDetails() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {transactions && (
+                  {transactionsData && (
                     <TransactionsList
-                      transactions={transactions}
+                      transactions={transactionsData}
                       onPaginationChange={handlePaginationChange}
                       onSearchChange={handleSearchChange}
                       onSortChange={handleSortChange}
                       onCategoryFilterChange={handleCategoryFilterChange}
-                      sortField={filterParams.sortField || 'date'}
-                      sortOrder={filterParams.sortOrder || 'desc'}
-                      categoryFilter={filterParams.categoryFilter || 'all'}
+                      sortField={filterParams.sortField}
+                      sortOrder={filterParams.sortOrder}
+                      categoryFilter={filterParams.categoryFilter}
                       categories={categories}
                     />
                   )}
@@ -285,7 +483,7 @@ export function InvoiceDetails() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {transactions && transactions.data.some((tx: any) => tx.is_recommended) ? (
+                {hasRecommendedTransactions ? (
                   <div className="space-y-4">
                     <Alert>
                       <IconAlertCircle className="h-4 w-4" />

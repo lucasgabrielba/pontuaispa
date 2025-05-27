@@ -1,5 +1,5 @@
 // src/features/faturas/details/components/transactions-list.tsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { 
@@ -57,42 +57,63 @@ export function TransactionsList({
   categoryFilter,
   categories
 }: TransactionsListProps) {
+  // Use o valor atual do search como estado inicial
   const [searchQuery, setSearchQuery] = useState('')
+  
+  // Quando os parâmetros externos mudam, atualize o estado local do searchQuery
+  useEffect(() => {
+    // Este efeito sincroniza o campo de pesquisa com o valor externo
+    if (transactions) {
+      // Podemos obter o valor do search a partir dos filtros ou da URL
+      // Este valor vem dos parâmetros props que vêm do componente pai
+      const currentSearchFromParams = new URLSearchParams(window.location.search).get('search') || '';
+      
+      // Só atualiza se for diferente para evitar loops
+      if (currentSearchFromParams !== searchQuery) {
+        console.log('Sincronizando campo de busca com valor da URL:', currentSearchFromParams);
+        setSearchQuery(currentSearchFromParams);
+      }
+    }
+  }, [transactions, searchQuery]);
   
   // Aplicar debounce à pesquisa
   useEffect(() => {
     const timer = setTimeout(() => {
-      onSearchChange(searchQuery);
+      // Não dispare a pesquisa apenas se o componente acabou de ser carregado e a busca estiver vazia
+      if (searchQuery !== '') {
+        console.log('Aplicando busca:', searchQuery);
+        onSearchChange(searchQuery);
+      }
     }, 500);
 
     return () => clearTimeout(timer);
   }, [searchQuery, onSearchChange]);
 
   // Função para alternar a ordenação
-  const toggleSort = (field: 'date' | 'amount' | 'merchant') => {
+  const toggleSort = useCallback((field: 'date' | 'amount' | 'merchant') => {
+    console.log('Alterando ordenação:', field, sortField === field ? (sortOrder === 'asc' ? 'desc' : 'asc') : 'desc');
     if (sortField === field) {
       onSortChange(field, sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       onSortChange(field, 'desc');
     }
-  }
+  }, [sortField, sortOrder, onSortChange]);
 
   // Função para formatar data
-  const formatTransactionDate = (dateString: string) => {
+  const formatTransactionDate = useCallback((dateString: string) => {
     try {
       return format(new Date(dateString), 'dd/MM', { locale: pt })
     } catch (e) {
       console.log(e);
       return dateString
     }
-  }
+  }, []);
 
   // Função para lidar com a mudança de página
-  const handlePageChange = (page: number) => {
-    if (onPaginationChange) {
-      onPaginationChange(page);
-    }
-  }
+  const handlePageChange = useCallback((page: number) => {
+    console.log('TransactionsList - Mudando para página:', page);
+    onPaginationChange(page);
+  }, [onPaginationChange]);
 
   return (
     <div className="space-y-4">
@@ -126,7 +147,7 @@ export function TransactionsList({
         </Select>
       </div>
 
-      {transactions.data.length === 0 ? (
+      {!transactions.data || transactions.data.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           Nenhuma transação encontrada
         </div>
