@@ -1,4 +1,3 @@
-// src/features/faturas/details/index.tsx
 import { useParams, useNavigate, useSearch } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
@@ -19,6 +18,7 @@ import { TransactionsList } from './components/transactions-list'
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { invoicesService } from '@/services/invoices-service'
+import { TransactionOptimizationsComponent } from '../upload/components/transaction-optimizations'
 
 // Definir os parâmetros de pesquisa para a rota
 interface SearchParams {
@@ -475,7 +475,7 @@ export function InvoiceDetails() {
               </Card>
             </div>
 
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Oportunidades de Pontos</CardTitle>
                 <CardDescription>
@@ -507,7 +507,9 @@ export function InvoiceDetails() {
                   </div>
                 )}
               </CardContent>
-            </Card>
+            </Card> */}
+
+             <TransactionOptimizationsComponent />
           </>
         )}
       </Main>

@@ -21,9 +21,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { useCards } from "@/hooks/use-cards"
-import type { RecommendedCard } from "@/types/cards"
+import { useAnalysis } from "@/hooks/use-analysis"
 import { CardComponent } from "./components/card-component"
 import { CardFormDrawer } from "./components/card-form-drawer"
+import { CardRecommendationsComponent } from "./components/card-recommendations"
 
 export default function CardsPage() {
   const {
@@ -49,6 +50,10 @@ export default function CardsPage() {
     isSubmitting,
     isDeleting,
   } = useCards()
+
+  // Usamos o hook de análise para recomendações avançadas baseadas em IA
+  const { cardsRecommendation } = useAnalysis(cards && cards.length > 0);
+  const hasAIRecommendations = cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0;
 
   return (
     <>
@@ -83,7 +88,15 @@ export default function CardsPage() {
         <Tabs defaultValue="meus-cartoes" className="space-y-4">
           <TabsList>
             <TabsTrigger value="meus-cartoes">Meus Cartões</TabsTrigger>
-            <TabsTrigger value="recomendados">Recomendados</TabsTrigger>
+            {hasAIRecommendations && (
+              <TabsTrigger value="ai-recomendados" className="relative">
+                Recomendações IA
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                </span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="meus-cartoes" className="space-y-4">
@@ -114,57 +127,13 @@ export default function CardsPage() {
               />
             )}
           </TabsContent>
-
-          <TabsContent value="recomendados" className="space-y-4">
-            {isLoadingRecommendedCards ? (
-              <CardUI>
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2 mt-2" />
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="rounded-lg border p-4 flex flex-col">
-                        <Skeleton className="h-6 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-1/2 mb-4" />
-                        <Skeleton className="h-4 w-full mb-2" />
-                        <Skeleton className="h-4 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-full mb-4" />
-                        <div className="mt-auto pt-4 flex justify-between items-center">
-                          <Skeleton className="h-5 w-1/4" />
-                          <Skeleton className="h-8 w-20" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </CardUI>
-            ) : recommendedCards && recommendedCards.length > 0 ? (
-              <CardUI>
-                <CardHeader>
-                  <CardTitle>Cartões Recomendados para o seu Perfil</CardTitle>
-                  <CardDescription>
-                    Com base nos seus gastos, recomendamos estes cartões para maximizar pontos
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {recommendedCards.map((card) => (
-                      <RecommendedCardComponent key={card.id} card={card} />
-                    ))}
-                  </div>
-                </CardContent>
-              </CardUI>
-            ) : (
-              <EmptyState
-                title="Nenhuma recomendação disponível"
-                description="Adicione cartões e importe suas faturas para começar a receber recomendações personalizadas."
-                actionLabel="Adicionar Cartão"
-                onAction={handleOpenAddCardForm}
-              />
-            )}
-          </TabsContent>
+          
+          {/* Nova aba para recomendações baseadas em IA */}
+          {hasAIRecommendations && (
+            <TabsContent value="ai-recomendados" className="space-y-4">
+              <CardRecommendationsComponent />
+            </TabsContent>
+          )}
         </Tabs>
 
         <CardFormDrawer
@@ -230,7 +199,7 @@ function CardSkeleton() {
 }
 
 interface RecommendedCardComponentProps {
-  card: RecommendedCard
+  card: any
 }
 
 function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
@@ -244,9 +213,6 @@ function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
       <div className="text-sm mb-2">
         <span className="font-medium">Vantagens:</span> {card.benefits}
       </div>
-      {/* <div className="text-sm">
-        <span className="font-medium">Programa:</span> {card.reward_program_name}
-      </div> */}
       <div className="mt-auto pt-4 flex justify-between items-center">
         <div className="text-primary font-semibold">{card.potential_increase}% mais pontos</div>
         <Button variant="outline" size="sm">

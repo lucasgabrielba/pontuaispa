@@ -10,37 +10,39 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { IconCreditCard, IconArrowUpRight, IconBuildingStore, IconLighter } from '@tabler/icons-react'
+import { 
+  IconCreditCard, 
+  IconArrowUpRight, 
+  IconBuildingStore, 
+  IconLighter,
+  IconAlertCircle
+} from '@tabler/icons-react'
+import { useAnalysis } from '@/hooks/use-analysis'
+import { useOnboarding } from '@/hooks/use-onboarding'
+import { CardRecommendation } from '@/services/analysis-service'
 
-interface Recommendation {
-  id: number | string;
-  title: string;
-  description: string;
-  type: "merchant" | "card";
-  recommendation: string;
-  potentialGain: number;
-}
+export function RecommendationsListAI() {
+  const { userHasCards } = useOnboarding();
+  const { cardsRecommendation } = useAnalysis(userHasCards.data || false);
+  
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const isLoading = cardsRecommendation.isLoading || cardsRecommendation.isRefetching || userHasCards.isLoading;
 
-interface RecommendationsListProps {
-  data?: Recommendation[]
-  isLoading?: boolean
-}
-
-export function RecommendationsList({ data, isLoading = false }: RecommendationsListProps) {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
-  const [loading, setLoading] = useState(isLoading)
-
+  // Converter recomendações do formato do backend para o formato esperado pelo componente existente
   useEffect(() => {
-    if (isLoading) {
-      const timer = setTimeout(() => {
-        setLoading(false)
-        setRecommendations(data || [])
-      }, 2200)
-      return () => clearTimeout(timer)
-    } else {
-      setRecommendations(data || [])
+    if (cardsRecommendation.data?.recommendations) {
+      const formattedRecommendations = cardsRecommendation.data.recommendations.map((rec: CardRecommendation) => ({
+        id: Math.random().toString(),
+        title: rec.card_name,
+        description: rec.description,
+        type: "card",
+        recommendation: rec.analysis,
+        potentialGain: parseInt(rec.potential_points_increase.replace('%', '')) || 0
+      }));
+      
+      setRecommendations(formattedRecommendations);
     }
-  }, [isLoading, data])
+  }, [cardsRecommendation.data]);
 
   function getBadgeVariant(gain: number) {
     if (gain > 150) return "destructive"
@@ -48,7 +50,7 @@ export function RecommendationsList({ data, isLoading = false }: Recommendations
     return "secondary"
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-4">
         {[1, 2].map((i) => (
@@ -75,6 +77,17 @@ export function RecommendationsList({ data, isLoading = false }: Recommendations
     )
   }
 
+  if (cardsRecommendation.isError) {
+    return (
+      <Alert variant="default" className="bg-muted">
+        <IconAlertCircle className="h-4 w-4 mr-2" />
+        <AlertDescription>
+          Não foi possível carregar as recomendações. Tente novamente mais tarde.
+        </AlertDescription>
+      </Alert>
+    )
+  }
+
   if (!recommendations || recommendations.length === 0) {
     return (
       <Alert variant="default" className="bg-muted">
@@ -88,6 +101,17 @@ export function RecommendationsList({ data, isLoading = false }: Recommendations
 
   return (
     <div className="space-y-4">
+      {/* Mostrar mensagem de resumo se existir */}
+      {cardsRecommendation.data?.summary && (
+        <Alert>
+          <IconAlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {cardsRecommendation.data.summary}
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {/* Lista de recomendações */}
       {recommendations.map((recommendation) => (
         <Card key={recommendation.id} className="relative">
           <CardHeader className="pb-2">
@@ -122,6 +146,25 @@ export function RecommendationsList({ data, isLoading = false }: Recommendations
           </CardContent>
         </Card>
       ))}
+      
+      {/* Lista de ações recomendadas se existirem */}
+      {cardsRecommendation.data?.action_items && cardsRecommendation.data.action_items.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Ações Recomendadas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {cardsRecommendation.data.action_items.map((action, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <IconAlertCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span>{action}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

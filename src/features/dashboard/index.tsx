@@ -1,4 +1,4 @@
-// src/features/dashboard/index.tsx
+// src/features/dashboard/index-ai.tsx
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +18,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { Overview } from './components/overview'
 import { RecentTransactions } from './components/recent-transactions'
 import { PointsStatus } from './components/points-status'
-import { RecommendationsList } from './components/recommendations-list'
+import { RecommendationsListAI } from './components/recommendations-list'
 import { CreditCard, Upload, Waypoints } from 'lucide-react'
 import { useDashboard } from '@/hooks/use-dashboard'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,8 +26,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useOnboarding } from '@/hooks/use-onboarding'
 import { useEffect, useState } from 'react'
+import { useAnalysis } from '@/hooks/use-analysis'
 
-export default function Dashboard() {
+export default function DashboardWithAI() {
   const navigate = useNavigate()
   const { userHasCards } = useOnboarding()
   const [hasData, setHasData] = useState<boolean | null>(null)
@@ -39,14 +40,19 @@ export default function Dashboard() {
     }
   }, [userHasCards.isSuccess, userHasCards.data])
   
-  // Buscar dados do dashboard
+  // Buscar dados do dashboard tradicional
   const { 
     stats, 
     transactions, 
     pointsPrograms, 
     monthlySpent,
-    recommendations 
   } = useDashboard(hasData !== null ? hasData : true)
+  
+  // Buscar dados do serviço de análise com IA
+  const {
+    cardsRecommendation,
+    pointsSummary
+  } = useAnalysis(hasData !== null ? hasData : true)
   
   // Função para formatar valor monetário
   const formatCurrency = (value: number) => {
@@ -185,19 +191,23 @@ export default function Dashboard() {
                   <Waypoints className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  {stats.isLoading ? (
+                  {stats.isLoading || cardsRecommendation.isLoading ? (
                     <Skeleton className="h-8 w-24" />
                   ) : (
                     <div className='text-2xl font-bold'>
-                      {stats.data?.potentialPoints ? `+${stats.data.potentialPoints}` : 0}
+                      {cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0 
+                        ? `+${cardsRecommendation.data.recommendations[0].potential_points_increase}`
+                        : (stats.data?.potentialPoints ? `+${stats.data.potentialPoints}` : 0)}
                     </div>
                   )}
                   
-                  {stats.isLoading ? (
+                  {stats.isLoading || cardsRecommendation.isLoading ? (
                     <Skeleton className="h-4 w-36 mt-1" />
                   ) : (
                     <p className='text-xs text-muted-foreground'>
-                      {stats.data?.potentialPoints ? "+93% de oportunidade" : "Adicione cartões para ver seu potencial"}
+                      {cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0 
+                        ? "Aumento potencial com recomendações"
+                        : (stats.data?.potentialPoints ? "+93% de oportunidade" : "Adicione cartões para ver seu potencial")}
                     </p>
                   )}
                 </CardContent>
@@ -281,21 +291,31 @@ export default function Dashboard() {
               
               <Card className='col-span-1'>
                 <CardHeader>
-                  <CardTitle>Histórico de Pontos</CardTitle>
+                  <CardTitle>Pontos a Expirar</CardTitle>
                   <CardDescription>
-                    Evolução dos pontos nos últimos 6 meses
+                    Pontos que expiram nos próximos 90 dias
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {stats.isLoading ? (
+                  {pointsSummary.isLoading ? (
                     <Skeleton className="h-64 w-full" />
+                  ) : pointsSummary.data?.expiring_points && pointsSummary.data.expiring_points.length > 0 ? (
+                    <div className="space-y-4">
+                      {pointsSummary.data.expiring_points.map((item, index) => (
+                        <div key={index} className="flex justify-between items-center p-3 border rounded-md">
+                          <div>
+                            <div className="font-medium">{item.program}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Expira em: {new Date(item.expiration_date).toLocaleDateString('pt-BR')}
+                            </div>
+                          </div>
+                          <div className="text-lg font-bold text-primary">{item.amount.toLocaleString()} pts</div>
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <div className="h-64 w-full flex items-center justify-center text-muted-foreground">
-                      {isEmpty ? (
-                        "Adicione faturas para visualizar seu histórico de pontos"
-                      ) : (
-                        "Gráfico de histórico de pontos será exibido aqui"
-                      )}
+                      Não há pontos com expiração próxima
                     </div>
                   )}
                 </CardContent>
@@ -303,21 +323,37 @@ export default function Dashboard() {
               
               <Card className='col-span-1 lg:col-span-2'>
                 <CardHeader>
-                  <CardTitle>Onde você mais acumula pontos</CardTitle>
+                  <CardTitle>Recomendações para seus Pontos</CardTitle>
                   <CardDescription>
-                    Principais estabelecimentos e categorias
+                    Como aproveitar melhor seus pontos acumulados
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {stats.isLoading ? (
-                    <Skeleton className="h-64 w-full" />
-                  ) : (
-                    <div className="h-64 w-full flex items-center justify-center text-muted-foreground">
-                      {isEmpty ? (
-                        "Adicione faturas para visualizar onde você mais acumula pontos"
-                      ) : (
-                        "Detalhamento de pontos por estabelecimento/categoria será exibido aqui"
+                  {pointsSummary.isLoading ? (
+                    <Skeleton className="h-48 w-full" />
+                  ) : pointsSummary.data?.recommendations ? (
+                    <div className="space-y-4">
+                      <Alert variant="default">
+                        <IconAlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          {pointsSummary.data.recommendations.message}
+                        </AlertDescription>
+                      </Alert>
+                      
+                      {pointsSummary.data.recommendations.suggested_actions && (
+                        <ul className="space-y-2">
+                          {pointsSummary.data.recommendations.suggested_actions.map((action, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                              <IconAlertCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                              <span>{action}</span>
+                            </li>
+                          ))}
+                        </ul>
                       )}
+                    </div>
+                  ) : (
+                    <div className="h-48 w-full flex items-center justify-center text-muted-foreground">
+                      Adicione faturas para receber recomendações sobre seus pontos
                     </div>
                   )}
                 </CardContent>
@@ -334,10 +370,7 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <RecommendationsList 
-                  data={recommendations.data} 
-                  isLoading={recommendations.isLoading || recommendations.isRefetching} 
-                />
+                <RecommendationsListAI />
               </CardContent>
             </Card>
           </TabsContent>
