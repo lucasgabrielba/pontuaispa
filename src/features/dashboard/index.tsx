@@ -111,7 +111,7 @@ export default function DashboardWithAI() {
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
               <TabsTrigger value='overview'>Visão Geral</TabsTrigger>
-              <TabsTrigger value='points'>Pontos</TabsTrigger>
+              {/* <TabsTrigger value='points'>Pontos</TabsTrigger> */}
               <TabsTrigger value='recommendations'>Recomendações</TabsTrigger>
             </TabsList>
           </div>

@@ -5,6 +5,9 @@ const ACCESS_TOKEN = 'thisisjustarandomstring'
 
 interface AuthUser {
   accountNo: string
+  id: string
+  avatar?: string
+  name: string
   email: string
   role: string[]
   exp: number
@@ -52,4 +55,4 @@ export const useAuthStore = create<AuthState>()((set) => {
   }
 })
 
-// export const useAuth = () => useAuthStore((state) => state.auth)
+export const useAuth = () => useAuthStore((state) => state.auth)

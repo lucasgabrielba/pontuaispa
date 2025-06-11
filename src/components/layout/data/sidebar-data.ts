@@ -6,7 +6,7 @@ import {
   IconSettings,
   IconTool,
 } from '@tabler/icons-react'
-import { CreditCard, FileText, SquareAsterisk, Waypoints } from 'lucide-react'
+import { CreditCard, FileText, SquareAsterisk } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -42,11 +42,11 @@ export const sidebarData: SidebarData = {
           url: '/faturas',
           icon: FileText,
         },
-        {
-          title: 'Pontos',
-          url: '/pontos',
-          icon: Waypoints,
-        },
+        // {
+        //   title: 'Pontos',
+        //   url: '/pontos',
+        //   icon: Waypoints,
+        // },
       ],
     },
     {

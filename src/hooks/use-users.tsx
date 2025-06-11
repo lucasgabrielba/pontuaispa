@@ -13,7 +13,7 @@ export const useUsers = () => {
   })
 
   // Buscar usuário por ID
-  const useGetUserById = (id: number) => useQuery({
+  const useGetUserById = (id: string) => useQuery({
     queryKey: ['users', id],
     queryFn: () => userService.getById(id).then(res => res.data),
     enabled: !!id
@@ -40,7 +40,7 @@ export const useUsers = () => {
 
   // Atualizar usuário
   const updateUsuario = useMutation({
-    mutationFn: ({ id, data }: { id: number, data: any }) => 
+    mutationFn: ({ id, data }: { id: string, data: any }) => 
       userService.update(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
@@ -61,7 +61,7 @@ export const useUsers = () => {
 
   // Excluir usuário
   const deleteUsuario = useMutation({
-    mutationFn: (id: number) => userService.delete(id),
+    mutationFn: (id: string) => userService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       toast({
