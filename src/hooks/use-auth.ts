@@ -1,8 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { authService } from '@/services/auth-service'
 import { useAuthStore } from '@/stores/authStore'
 import { toast } from '@/hooks/use-toast'
+import { User } from '@/types/users'
 
 export const useAuth = () => {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ export const useAuth = () => {
     },
     retry: false,
     enabled: false // Não executar automaticamente
-  })
+  }) as UseQueryResult<User>
 
   // Login
   const login = useMutation({
@@ -45,7 +46,20 @@ export const useAuth = () => {
         description: 'Bem-vindo de volta!'
       })
 
-      navigate({ to: '/' })
+      // Redirecionamento inteligente pós-login
+      const user = queryClient.getQueryData(['auth-user'])
+      let isAdmin = false
+      // @ts-ignore
+      if (user && Array.isArray(user.roles)) {
+        // @ts-ignore
+        isAdmin = user.roles.some((role: any) => role.name === 'admin' || role.name === 'super_admin')
+      }
+
+      if (isAdmin) {
+        navigate({ to: '/admin' })
+      } else {
+        navigate({ to: '/' }) 
+      }
     },
     onError: (error: any) => {
       console.error('Erro ao fazer login:', error)

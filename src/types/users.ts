@@ -4,11 +4,25 @@ import { Point } from './rewards';
 
 export type UserStatus = 'Ativo' | 'Inativo';
 
+export interface UserRole {
+  id: number;
+  name: 'super_admin' | 'admin' | 'client';
+  guard_name: string;
+  created_at: string;
+  updated_at: string;
+  pivot?: {
+    model_type: string;
+    model_id: string;
+    role_id: number;
+  };
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   status: UserStatus;
+  roles: UserRole[];
   preferences?: Record<string, any> | null;
   created_at?: string;
   updated_at?: string;
