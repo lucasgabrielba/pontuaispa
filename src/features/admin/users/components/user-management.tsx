@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
-import { UserDialog } from './user-dialog'
-import { UserDeleteDialog } from './user-delete-dialog'
 import { Pencil, Trash2, Plus, Search } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { Pagination } from '@/components/pagination'
+import { PaginationItem, PaginationLink, PaginationContent, PaginationPrevious, PaginationNext } from '@/components/ui/pagination'
+import { UserDeleteDialog } from './user-delete-dialog'
+import { UserDialog } from './user-dialog'
 
 export function UserManagement() {
   const [page, setPage] = useState(1)
@@ -144,7 +145,7 @@ export function UserManagement() {
 
           {usersData && usersData.last_page > 1 && (
             <div className="mt-4 flex justify-center">
-              <Pagination>
+              <Pagination currentPage={usersData.current_page} totalPages={usersData.last_page} onPageChange={handlePageChange}>
                 <PaginationContent>
                   {usersData.current_page > 1 && (
                     <PaginationItem>

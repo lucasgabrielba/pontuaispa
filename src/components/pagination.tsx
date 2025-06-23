@@ -1,6 +1,3 @@
-// Este é o código que precisamos garantir para o componente de paginação
-// Verifique se seu componente implementa adequadamente o método onPageChange
-
 import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
@@ -10,36 +7,31 @@ interface PaginationProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   maxButtons?: number;
-}
+  children?: React.ReactNode;
+} 
 
 export function Pagination({
   currentPage,
   totalPages,
   onPageChange,
   maxButtons = 5,
+  children
 }: PaginationProps) {
-  console.log('Pagination component - currentPage:', currentPage, 'totalPages:', totalPages);
 
   const handlePageChange = useCallback((page: number) => {
-    console.log('Pagination component - changing to page:', page);
     if (page >= 1 && page <= totalPages) {
       onPageChange(page);
     }
   }, [onPageChange, totalPages]);
 
-  // Não modificando a lógica de exibição, apenas garantindo que o evento seja chamado corretamente
-
-  // Gerar botões de paginação
   const generatePageButtons = () => {
     const buttons = [];
     let startPage, endPage;
 
     if (totalPages <= maxButtons) {
-      // Mostrar todas as páginas se o total for menor que o máximo de botões
       startPage = 1;
       endPage = totalPages;
     } else {
-      // Calcular quais páginas mostrar
       const halfMaxButtons = Math.floor(maxButtons / 2);
       
       if (currentPage <= halfMaxButtons) {
@@ -54,7 +46,6 @@ export function Pagination({
       }
     }
 
-    // Botão de página anterior
     buttons.push(
       <Button
         key="prev"
@@ -67,7 +58,6 @@ export function Pagination({
       </Button>
     );
 
-    // Botões com números de página
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <Button
@@ -82,14 +72,12 @@ export function Pagination({
       );
     }
 
-    // Info de página atual (mobile)
     buttons.push(
       <span key="mobile-info" className="text-sm text-muted-foreground sm:hidden">
         Página {currentPage} de {totalPages}
       </span>
     );
 
-    // Botão de próxima página
     buttons.push(
       <Button
         key="next"
@@ -107,7 +95,7 @@ export function Pagination({
 
   return (
     <div className="flex items-center gap-1">
-      {generatePageButtons()}
+      {children ? children : generatePageButtons()}
     </div>
   );
 }
