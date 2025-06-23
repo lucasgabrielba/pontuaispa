@@ -21,7 +21,7 @@ export const useAuth = () => {
       return response.data
     },
     retry: false,
-    enabled: false // Não executar automaticamente
+    enabled: true // Executar automaticamente
   }) as UseQueryResult<User>
 
   // Login
