@@ -21,10 +21,10 @@ import { Route as auth500Import } from './routes/(auth)/500'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedPontosIndexImport } from './routes/_authenticated/pontos/index'
 import { Route as AuthenticatedCartoesIndexImport } from './routes/_authenticated/cartoes/index'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users/route'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings/route'
-import { Route as AuthenticatedAdminInvoicesRouteImport } from './routes/_authenticated/admin/invoices/route'
-import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics/route'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios/route'
+import { Route as AuthenticatedAdminFaturasRouteImport } from './routes/_authenticated/admin/faturas/route'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes/route'
+import { Route as AuthenticatedAdminAnalisesRouteImport } from './routes/_authenticated/admin/analises/route'
 
 // Create Virtual Routes
 
@@ -290,31 +290,31 @@ const AuthenticatedConfiguracoesAparenciaLazyRoute =
     ),
   )
 
-const AuthenticatedAdminUsersRouteRoute =
-  AuthenticatedAdminUsersRouteImport.update({
-    id: '/users',
-    path: '/users',
+const AuthenticatedAdminUsuariosRouteRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
-const AuthenticatedAdminSettingsRouteRoute =
-  AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
+const AuthenticatedAdminFaturasRouteRoute =
+  AuthenticatedAdminFaturasRouteImport.update({
+    id: '/faturas',
+    path: '/faturas',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
-const AuthenticatedAdminInvoicesRouteRoute =
-  AuthenticatedAdminInvoicesRouteImport.update({
-    id: '/invoices',
-    path: '/invoices',
+const AuthenticatedAdminConfiguracoesRouteRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
-const AuthenticatedAdminAnalyticsRouteRoute =
-  AuthenticatedAdminAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
+const AuthenticatedAdminAnalisesRouteRoute =
+  AuthenticatedAdminAnalisesRouteImport.update({
+    id: '/analises',
+    path: '/analises',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
@@ -427,32 +427,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
-    '/_authenticated/admin/analytics': {
-      id: '/_authenticated/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+    '/_authenticated/admin/analises': {
+      id: '/_authenticated/admin/analises'
+      path: '/analises'
+      fullPath: '/admin/analises'
+      preLoaderRoute: typeof AuthenticatedAdminAnalisesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteImport
     }
-    '/_authenticated/admin/invoices': {
-      id: '/_authenticated/admin/invoices'
-      path: '/invoices'
-      fullPath: '/admin/invoices'
-      preLoaderRoute: typeof AuthenticatedAdminInvoicesRouteImport
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteImport
     }
-    '/_authenticated/admin/settings': {
-      id: '/_authenticated/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+    '/_authenticated/admin/faturas': {
+      id: '/_authenticated/admin/faturas'
+      path: '/faturas'
+      fullPath: '/admin/faturas'
+      preLoaderRoute: typeof AuthenticatedAdminFaturasRouteImport
       parentRoute: typeof AuthenticatedAdminRouteImport
     }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteImport
     }
     '/_authenticated/configuracoes/aparencia': {
@@ -538,19 +538,19 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedAdminRouteRouteChildren {
-  AuthenticatedAdminAnalyticsRouteRoute: typeof AuthenticatedAdminAnalyticsRouteRoute
-  AuthenticatedAdminInvoicesRouteRoute: typeof AuthenticatedAdminInvoicesRouteRoute
-  AuthenticatedAdminSettingsRouteRoute: typeof AuthenticatedAdminSettingsRouteRoute
-  AuthenticatedAdminUsersRouteRoute: typeof AuthenticatedAdminUsersRouteRoute
+  AuthenticatedAdminAnalisesRouteRoute: typeof AuthenticatedAdminAnalisesRouteRoute
+  AuthenticatedAdminConfiguracoesRouteRoute: typeof AuthenticatedAdminConfiguracoesRouteRoute
+  AuthenticatedAdminFaturasRouteRoute: typeof AuthenticatedAdminFaturasRouteRoute
+  AuthenticatedAdminUsuariosRouteRoute: typeof AuthenticatedAdminUsuariosRouteRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
-    AuthenticatedAdminAnalyticsRouteRoute:
-      AuthenticatedAdminAnalyticsRouteRoute,
-    AuthenticatedAdminInvoicesRouteRoute: AuthenticatedAdminInvoicesRouteRoute,
-    AuthenticatedAdminSettingsRouteRoute: AuthenticatedAdminSettingsRouteRoute,
-    AuthenticatedAdminUsersRouteRoute: AuthenticatedAdminUsersRouteRoute,
+    AuthenticatedAdminAnalisesRouteRoute: AuthenticatedAdminAnalisesRouteRoute,
+    AuthenticatedAdminConfiguracoesRouteRoute:
+      AuthenticatedAdminConfiguracoesRouteRoute,
+    AuthenticatedAdminFaturasRouteRoute: AuthenticatedAdminFaturasRouteRoute,
+    AuthenticatedAdminUsuariosRouteRoute: AuthenticatedAdminUsuariosRouteRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =
@@ -629,10 +629,10 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
-  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRouteRoute
-  '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteRoute
-  '/admin/settings': typeof AuthenticatedAdminSettingsRouteRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRouteRoute
+  '/admin/analises': typeof AuthenticatedAdminAnalisesRouteRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRouteRoute
+  '/admin/faturas': typeof AuthenticatedAdminFaturasRouteRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteRoute
   '/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
@@ -659,10 +659,10 @@ export interface FileRoutesByTo {
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
-  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRouteRoute
-  '/admin/invoices': typeof AuthenticatedAdminInvoicesRouteRoute
-  '/admin/settings': typeof AuthenticatedAdminSettingsRouteRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRouteRoute
+  '/admin/analises': typeof AuthenticatedAdminAnalisesRouteRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRouteRoute
+  '/admin/faturas': typeof AuthenticatedAdminFaturasRouteRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteRoute
   '/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
@@ -693,10 +693,10 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500LazyRoute
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRouteRoute
-  '/_authenticated/admin/invoices': typeof AuthenticatedAdminInvoicesRouteRoute
-  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRouteRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteRoute
+  '/_authenticated/admin/analises': typeof AuthenticatedAdminAnalisesRouteRoute
+  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRouteRoute
+  '/_authenticated/admin/faturas': typeof AuthenticatedAdminFaturasRouteRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteRoute
   '/_authenticated/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/_authenticated/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
@@ -727,10 +727,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/503'
     | '/'
-    | '/admin/analytics'
-    | '/admin/invoices'
-    | '/admin/settings'
-    | '/admin/users'
+    | '/admin/analises'
+    | '/admin/configuracoes'
+    | '/admin/faturas'
+    | '/admin/usuarios'
     | '/configuracoes/aparencia'
     | '/configuracoes/conta'
     | '/configuracoes/notificacoes'
@@ -756,10 +756,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/503'
     | '/'
-    | '/admin/analytics'
-    | '/admin/invoices'
-    | '/admin/settings'
-    | '/admin/users'
+    | '/admin/analises'
+    | '/admin/configuracoes'
+    | '/admin/faturas'
+    | '/admin/usuarios'
     | '/configuracoes/aparencia'
     | '/configuracoes/conta'
     | '/configuracoes/notificacoes'
@@ -788,10 +788,10 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
-    | '/_authenticated/admin/analytics'
-    | '/_authenticated/admin/invoices'
-    | '/_authenticated/admin/settings'
-    | '/_authenticated/admin/users'
+    | '/_authenticated/admin/analises'
+    | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/faturas'
+    | '/_authenticated/admin/usuarios'
     | '/_authenticated/configuracoes/aparencia'
     | '/_authenticated/configuracoes/conta'
     | '/_authenticated/configuracoes/notificacoes'
@@ -879,10 +879,10 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/admin/route.tsx",
       "parent": "/_authenticated",
       "children": [
-        "/_authenticated/admin/analytics",
-        "/_authenticated/admin/invoices",
-        "/_authenticated/admin/settings",
-        "/_authenticated/admin/users"
+        "/_authenticated/admin/analises",
+        "/_authenticated/admin/configuracoes",
+        "/_authenticated/admin/faturas",
+        "/_authenticated/admin/usuarios"
       ]
     },
     "/(auth)/500": {
@@ -932,20 +932,20 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/index.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/admin/analytics": {
-      "filePath": "_authenticated/admin/analytics/route.tsx",
+    "/_authenticated/admin/analises": {
+      "filePath": "_authenticated/admin/analises/route.tsx",
       "parent": "/_authenticated/admin"
     },
-    "/_authenticated/admin/invoices": {
-      "filePath": "_authenticated/admin/invoices/route.tsx",
+    "/_authenticated/admin/configuracoes": {
+      "filePath": "_authenticated/admin/configuracoes/route.tsx",
       "parent": "/_authenticated/admin"
     },
-    "/_authenticated/admin/settings": {
-      "filePath": "_authenticated/admin/settings/route.tsx",
+    "/_authenticated/admin/faturas": {
+      "filePath": "_authenticated/admin/faturas/route.tsx",
       "parent": "/_authenticated/admin"
     },
-    "/_authenticated/admin/users": {
-      "filePath": "_authenticated/admin/users/route.tsx",
+    "/_authenticated/admin/usuarios": {
+      "filePath": "_authenticated/admin/usuarios/route.tsx",
       "parent": "/_authenticated/admin"
     },
     "/_authenticated/configuracoes/aparencia": {

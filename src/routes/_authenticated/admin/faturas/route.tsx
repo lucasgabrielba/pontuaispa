@@ -1,12 +1,12 @@
 import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useIsAdmin } from '@/hooks/use-is-admin'
 
-export const Route = createFileRoute('/_authenticated/admin/analytics')({
+export const Route = createFileRoute('/_authenticated/admin/faturas')({
   component: () => {
     const isAdmin = useIsAdmin()
     if (!isAdmin) {
       return <Navigate to="/" />
     }
-    return <div>Analytics (Admin)</div>
+    return <div>Faturas (Admin)</div>
   },
 })
