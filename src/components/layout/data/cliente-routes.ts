@@ -1,6 +1,10 @@
 import {
   IconHelp,
   IconLayoutDashboard,
+  IconNotification,
+  IconPalette,
+  IconSettings,
+  IconTool,
 } from '@tabler/icons-react'
 import { CreditCard, FileText, SquareAsterisk } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -43,6 +47,27 @@ export const clienteSidebarData: SidebarData = {
     {
       title: 'Outros',
       items: [
+        {
+          title: 'Configurações',
+          icon: IconSettings,
+          items: [
+            {
+              title: 'Conta',
+              url: '/configuracoes/conta',
+              icon: IconTool,
+            },
+            {
+              title: 'Aparência',
+              url: '/configuracoes/aparencia',
+              icon: IconPalette,
+            },
+            {
+              title: 'Notificações',
+              url: '/configuracoes/notificacoes',
+              icon: IconNotification,
+            },
+          ],
+        },
         {
           title: 'Central de Ajuda',
           url: '/central-de-ajuda',

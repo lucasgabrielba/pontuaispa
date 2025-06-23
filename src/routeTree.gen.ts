@@ -18,13 +18,8 @@ import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index
 import { Route as authSignInImport } from './routes/(auth)/sign-in'
 import { Route as authOtpImport } from './routes/(auth)/otp'
 import { Route as auth500Import } from './routes/(auth)/500'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedPontosIndexImport } from './routes/_authenticated/pontos/index'
 import { Route as AuthenticatedCartoesIndexImport } from './routes/_authenticated/cartoes/index'
-import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios/route'
-import { Route as AuthenticatedAdminFaturasRouteImport } from './routes/_authenticated/admin/faturas/route'
-import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes/route'
-import { Route as AuthenticatedAdminAnalisesRouteImport } from './routes/_authenticated/admin/analises/route'
 
 // Create Virtual Routes
 
@@ -40,6 +35,9 @@ const authForgotPasswordLazyImport = createFileRoute(
 )()
 const AuthenticatedConfiguracoesRouteLazyImport = createFileRoute(
   '/_authenticated/configuracoes',
+)()
+const AuthenticatedAdminRouteLazyImport = createFileRoute(
+  '/_authenticated/admin',
 )()
 const AuthenticatedOnboardingIndexLazyImport = createFileRoute(
   '/_authenticated/onboarding/',
@@ -67,6 +65,15 @@ const AuthenticatedConfiguracoesContaLazyImport = createFileRoute(
 )()
 const AuthenticatedConfiguracoesAparenciaLazyImport = createFileRoute(
   '/_authenticated/configuracoes/aparencia',
+)()
+const AuthenticatedAdminUsuariosLazyImport = createFileRoute(
+  '/_authenticated/admin/usuarios',
+)()
+const AuthenticatedAdminFaturasLazyImport = createFileRoute(
+  '/_authenticated/admin/faturas',
+)()
+const AuthenticatedAdminAnalisesLazyImport = createFileRoute(
+  '/_authenticated/admin/analises',
 )()
 
 // Create/Update Routes
@@ -159,6 +166,15 @@ const AuthenticatedConfiguracoesRouteLazyRoute =
     ),
   )
 
+const AuthenticatedAdminRouteLazyRoute =
+  AuthenticatedAdminRouteLazyImport.update({
+    id: '/admin',
+    path: '/admin',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/admin/route.lazy').then((d) => d.Route),
+  )
+
 const authSignInRoute = authSignInImport.update({
   id: '/(auth)/sign-in',
   path: '/sign-in',
@@ -175,12 +191,6 @@ const auth500Route = auth500Import.update({
   id: '/(auth)/500',
   path: '/500',
   getParentRoute: () => rootRoute,
-} as any)
-
-const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 const AuthenticatedOnboardingIndexLazyRoute =
@@ -290,33 +300,32 @@ const AuthenticatedConfiguracoesAparenciaLazyRoute =
     ),
   )
 
-const AuthenticatedAdminUsuariosRouteRoute =
-  AuthenticatedAdminUsuariosRouteImport.update({
+const AuthenticatedAdminUsuariosLazyRoute =
+  AuthenticatedAdminUsuariosLazyImport.update({
     id: '/usuarios',
     path: '/usuarios',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
+    getParentRoute: () => AuthenticatedAdminRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/admin/usuarios.lazy').then((d) => d.Route),
+  )
 
-const AuthenticatedAdminFaturasRouteRoute =
-  AuthenticatedAdminFaturasRouteImport.update({
+const AuthenticatedAdminFaturasLazyRoute =
+  AuthenticatedAdminFaturasLazyImport.update({
     id: '/faturas',
     path: '/faturas',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
+    getParentRoute: () => AuthenticatedAdminRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/admin/faturas.lazy').then((d) => d.Route),
+  )
 
-const AuthenticatedAdminConfiguracoesRouteRoute =
-  AuthenticatedAdminConfiguracoesRouteImport.update({
-    id: '/configuracoes',
-    path: '/configuracoes',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-
-const AuthenticatedAdminAnalisesRouteRoute =
-  AuthenticatedAdminAnalisesRouteImport.update({
+const AuthenticatedAdminAnalisesLazyRoute =
+  AuthenticatedAdminAnalisesLazyImport.update({
     id: '/analises',
     path: '/analises',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
+    getParentRoute: () => AuthenticatedAdminRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/admin/analises.lazy').then((d) => d.Route),
+  )
 
 // Populate the FileRoutesByPath interface
 
@@ -328,13 +337,6 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRoute
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteImport
     }
     '/(auth)/500': {
       id: '/(auth)/500'
@@ -356,6 +358,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-in'
       preLoaderRoute: typeof authSignInImport
       parentRoute: typeof rootRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/configuracoes': {
       id: '/_authenticated/configuracoes'
@@ -431,29 +440,22 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/admin/analises'
       path: '/analises'
       fullPath: '/admin/analises'
-      preLoaderRoute: typeof AuthenticatedAdminAnalisesRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteImport
-    }
-    '/_authenticated/admin/configuracoes': {
-      id: '/_authenticated/admin/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/admin/configuracoes'
-      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminAnalisesLazyImport
+      parentRoute: typeof AuthenticatedAdminRouteLazyImport
     }
     '/_authenticated/admin/faturas': {
       id: '/_authenticated/admin/faturas'
       path: '/faturas'
       fullPath: '/admin/faturas'
-      preLoaderRoute: typeof AuthenticatedAdminFaturasRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminFaturasLazyImport
+      parentRoute: typeof AuthenticatedAdminRouteLazyImport
     }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
       path: '/usuarios'
       fullPath: '/admin/usuarios'
-      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosLazyImport
+      parentRoute: typeof AuthenticatedAdminRouteLazyImport
     }
     '/_authenticated/configuracoes/aparencia': {
       id: '/_authenticated/configuracoes/aparencia'
@@ -537,25 +539,22 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-interface AuthenticatedAdminRouteRouteChildren {
-  AuthenticatedAdminAnalisesRouteRoute: typeof AuthenticatedAdminAnalisesRouteRoute
-  AuthenticatedAdminConfiguracoesRouteRoute: typeof AuthenticatedAdminConfiguracoesRouteRoute
-  AuthenticatedAdminFaturasRouteRoute: typeof AuthenticatedAdminFaturasRouteRoute
-  AuthenticatedAdminUsuariosRouteRoute: typeof AuthenticatedAdminUsuariosRouteRoute
+interface AuthenticatedAdminRouteLazyRouteChildren {
+  AuthenticatedAdminAnalisesLazyRoute: typeof AuthenticatedAdminAnalisesLazyRoute
+  AuthenticatedAdminFaturasLazyRoute: typeof AuthenticatedAdminFaturasLazyRoute
+  AuthenticatedAdminUsuariosLazyRoute: typeof AuthenticatedAdminUsuariosLazyRoute
 }
 
-const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+const AuthenticatedAdminRouteLazyRouteChildren: AuthenticatedAdminRouteLazyRouteChildren =
   {
-    AuthenticatedAdminAnalisesRouteRoute: AuthenticatedAdminAnalisesRouteRoute,
-    AuthenticatedAdminConfiguracoesRouteRoute:
-      AuthenticatedAdminConfiguracoesRouteRoute,
-    AuthenticatedAdminFaturasRouteRoute: AuthenticatedAdminFaturasRouteRoute,
-    AuthenticatedAdminUsuariosRouteRoute: AuthenticatedAdminUsuariosRouteRoute,
+    AuthenticatedAdminAnalisesLazyRoute: AuthenticatedAdminAnalisesLazyRoute,
+    AuthenticatedAdminFaturasLazyRoute: AuthenticatedAdminFaturasLazyRoute,
+    AuthenticatedAdminUsuariosLazyRoute: AuthenticatedAdminUsuariosLazyRoute,
   }
 
-const AuthenticatedAdminRouteRouteWithChildren =
-  AuthenticatedAdminRouteRoute._addFileChildren(
-    AuthenticatedAdminRouteRouteChildren,
+const AuthenticatedAdminRouteLazyRouteWithChildren =
+  AuthenticatedAdminRouteLazyRoute._addFileChildren(
+    AuthenticatedAdminRouteLazyRouteChildren,
   )
 
 interface AuthenticatedConfiguracoesRouteLazyRouteChildren {
@@ -583,7 +582,7 @@ const AuthenticatedConfiguracoesRouteLazyRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedAdminRouteLazyRoute: typeof AuthenticatedAdminRouteLazyRouteWithChildren
   AuthenticatedConfiguracoesRouteLazyRoute: typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedFaturasInvoiceIdLazyRoute: typeof AuthenticatedFaturasInvoiceIdLazyRoute
@@ -596,7 +595,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedAdminRouteLazyRoute:
+    AuthenticatedAdminRouteLazyRouteWithChildren,
   AuthenticatedConfiguracoesRouteLazyRoute:
     AuthenticatedConfiguracoesRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
@@ -616,10 +616,10 @@ const AuthenticatedRouteRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteRouteWithChildren
-  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/500': typeof errors500LazyRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
+  '/admin': typeof AuthenticatedAdminRouteLazyRouteWithChildren
   '/configuracoes': typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   '/forgot-password': typeof authForgotPasswordLazyRoute
   '/sign-in-2': typeof authSignIn2LazyRoute
@@ -629,10 +629,9 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
-  '/admin/analises': typeof AuthenticatedAdminAnalisesRouteRoute
-  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRouteRoute
-  '/admin/faturas': typeof AuthenticatedAdminFaturasRouteRoute
-  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteRoute
+  '/admin/analises': typeof AuthenticatedAdminAnalisesLazyRoute
+  '/admin/faturas': typeof AuthenticatedAdminFaturasLazyRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosLazyRoute
   '/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
@@ -647,10 +646,10 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
-  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/500': typeof errors500LazyRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
+  '/admin': typeof AuthenticatedAdminRouteLazyRouteWithChildren
   '/forgot-password': typeof authForgotPasswordLazyRoute
   '/sign-in-2': typeof authSignIn2LazyRoute
   '/sign-up': typeof authSignUpLazyRoute
@@ -659,10 +658,9 @@ export interface FileRoutesByTo {
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
-  '/admin/analises': typeof AuthenticatedAdminAnalisesRouteRoute
-  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRouteRoute
-  '/admin/faturas': typeof AuthenticatedAdminFaturasRouteRoute
-  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteRoute
+  '/admin/analises': typeof AuthenticatedAdminAnalisesLazyRoute
+  '/admin/faturas': typeof AuthenticatedAdminFaturasLazyRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosLazyRoute
   '/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
@@ -679,10 +677,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/(auth)/500': typeof auth500Route
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteLazyRouteWithChildren
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordLazyRoute
   '/(auth)/sign-in-2': typeof authSignIn2LazyRoute
@@ -693,10 +691,9 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500LazyRoute
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/admin/analises': typeof AuthenticatedAdminAnalisesRouteRoute
-  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRouteRoute
-  '/_authenticated/admin/faturas': typeof AuthenticatedAdminFaturasRouteRoute
-  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteRoute
+  '/_authenticated/admin/analises': typeof AuthenticatedAdminAnalisesLazyRoute
+  '/_authenticated/admin/faturas': typeof AuthenticatedAdminFaturasLazyRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosLazyRoute
   '/_authenticated/configuracoes/aparencia': typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   '/_authenticated/configuracoes/conta': typeof AuthenticatedConfiguracoesContaLazyRoute
   '/_authenticated/configuracoes/notificacoes': typeof AuthenticatedConfiguracoesNotificacoesLazyRoute
@@ -714,10 +711,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-    | '/admin'
     | '/500'
     | '/otp'
     | '/sign-in'
+    | '/admin'
     | '/configuracoes'
     | '/forgot-password'
     | '/sign-in-2'
@@ -728,7 +725,6 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/admin/analises'
-    | '/admin/configuracoes'
     | '/admin/faturas'
     | '/admin/usuarios'
     | '/configuracoes/aparencia'
@@ -744,10 +740,10 @@ export interface FileRouteTypes {
     | '/onboarding'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/admin'
     | '/500'
     | '/otp'
     | '/sign-in'
+    | '/admin'
     | '/forgot-password'
     | '/sign-in-2'
     | '/sign-up'
@@ -757,7 +753,6 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/admin/analises'
-    | '/admin/configuracoes'
     | '/admin/faturas'
     | '/admin/usuarios'
     | '/configuracoes/aparencia'
@@ -774,10 +769,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
-    | '/_authenticated/admin'
     | '/(auth)/500'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
+    | '/_authenticated/admin'
     | '/_authenticated/configuracoes'
     | '/(auth)/forgot-password'
     | '/(auth)/sign-in-2'
@@ -789,7 +784,6 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/admin/analises'
-    | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/faturas'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/configuracoes/aparencia'
@@ -875,16 +869,6 @@ export const routeTree = rootRoute
         "/_authenticated/onboarding/"
       ]
     },
-    "/_authenticated/admin": {
-      "filePath": "_authenticated/admin/route.tsx",
-      "parent": "/_authenticated",
-      "children": [
-        "/_authenticated/admin/analises",
-        "/_authenticated/admin/configuracoes",
-        "/_authenticated/admin/faturas",
-        "/_authenticated/admin/usuarios"
-      ]
-    },
     "/(auth)/500": {
       "filePath": "(auth)/500.tsx"
     },
@@ -893,6 +877,15 @@ export const routeTree = rootRoute
     },
     "/(auth)/sign-in": {
       "filePath": "(auth)/sign-in.tsx"
+    },
+    "/_authenticated/admin": {
+      "filePath": "_authenticated/admin/route.lazy.tsx",
+      "parent": "/_authenticated",
+      "children": [
+        "/_authenticated/admin/analises",
+        "/_authenticated/admin/faturas",
+        "/_authenticated/admin/usuarios"
+      ]
     },
     "/_authenticated/configuracoes": {
       "filePath": "_authenticated/configuracoes/route.lazy.tsx",
@@ -933,19 +926,15 @@ export const routeTree = rootRoute
       "parent": "/_authenticated"
     },
     "/_authenticated/admin/analises": {
-      "filePath": "_authenticated/admin/analises/route.tsx",
-      "parent": "/_authenticated/admin"
-    },
-    "/_authenticated/admin/configuracoes": {
-      "filePath": "_authenticated/admin/configuracoes/route.tsx",
+      "filePath": "_authenticated/admin/analises.lazy.tsx",
       "parent": "/_authenticated/admin"
     },
     "/_authenticated/admin/faturas": {
-      "filePath": "_authenticated/admin/faturas/route.tsx",
+      "filePath": "_authenticated/admin/faturas.lazy.tsx",
       "parent": "/_authenticated/admin"
     },
     "/_authenticated/admin/usuarios": {
-      "filePath": "_authenticated/admin/usuarios/route.tsx",
+      "filePath": "_authenticated/admin/usuarios.lazy.tsx",
       "parent": "/_authenticated/admin"
     },
     "/_authenticated/configuracoes/aparencia": {

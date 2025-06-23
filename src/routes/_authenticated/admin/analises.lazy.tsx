@@ -1,7 +1,7 @@
-import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { createLazyFileRoute, Navigate } from '@tanstack/react-router'
 import { useIsAdmin } from '@/hooks/use-is-admin'
 
-export const Route = createFileRoute('/_authenticated/admin/analises')({
+export const Route = createLazyFileRoute('/_authenticated/admin/analises')({
   component: () => {
     const isAdmin = useIsAdmin()
     if (!isAdmin) {

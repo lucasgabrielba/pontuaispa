@@ -17,8 +17,11 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command'
-import { sidebarData } from './layout/data/sidebar-data'
+
 import { ScrollArea } from './ui/scroll-area'
+import { useIsAdmin } from '@/hooks/use-is-admin'
+import { adminSidebarData } from './layout/data/admin-routes'
+import { clienteSidebarData } from './layout/data/cliente-routes'
 
 export function CommandMenu() {
   const navigate = useNavigate()
@@ -32,6 +35,9 @@ export function CommandMenu() {
     },
     [setOpen]
   )
+
+  const isAdmin = useIsAdmin()
+  const sidebarData = isAdmin ? adminSidebarData : clienteSidebarData
 
   return (
     <CommandDialog modal open={open} onOpenChange={setOpen}>

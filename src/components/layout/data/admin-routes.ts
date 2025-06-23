@@ -6,7 +6,7 @@ import {
   IconSettings,
   IconTool,
 } from '@tabler/icons-react'
-import { CreditCard, FileText, SquareAsterisk } from 'lucide-react'
+import {  SquareAsterisk, Users } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const adminSidebarData: SidebarData = {
@@ -14,13 +14,13 @@ export const adminSidebarData: SidebarData = {
     name: 'Lucas',
     email: 'lucasgabrielba@gmail.com',
     avatar: '/avatars/shadcn.jpg',
-    plan: 'Plano Gratuito',
+    plan: 'Administrador',
   },
   teams: [
     {
       name: 'Pontu AI',
       logo: SquareAsterisk,
-      plan: 'Plano Gratuito',
+      plan: 'Administrador',
     }
   ],
   navGroups: [
@@ -33,14 +33,9 @@ export const adminSidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
-          title: 'Cartões',
-          url: '/cartoes',
-          icon: CreditCard,
-        },
-        {
-          title: 'Faturas',
-          url: '/faturas',
-          icon: FileText,
+          title: 'Usuários',
+          url: '/admin/usuarios',
+          icon: Users,
         },
       ],
     },
