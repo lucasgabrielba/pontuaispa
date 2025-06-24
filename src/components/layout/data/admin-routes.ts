@@ -6,7 +6,7 @@ import {
   IconSettings,
   IconTool,
 } from '@tabler/icons-react'
-import {  SquareAsterisk, Users } from 'lucide-react'
+import {  FileText, SquareAsterisk, Users } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const adminSidebarData: SidebarData = {
@@ -31,11 +31,16 @@ export const adminSidebarData: SidebarData = {
           title: 'Dashboard',
           url: '/',
           icon: IconLayoutDashboard,
-        },
+          },
         {
           title: 'Usuários',
           url: '/admin/usuarios',
           icon: Users,
+        },
+        {
+          title: 'Faturas',
+          url: '/admin/faturas',
+          icon: FileText,
         },
       ],
     },

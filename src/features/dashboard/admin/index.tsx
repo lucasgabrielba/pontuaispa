@@ -71,7 +71,7 @@ export default function AdminDashboard() {
               <Users className="mr-2 h-4 w-4" />
               Gerenciar Usuários
             </Button>
-            <Button onClick={() => navigate({ to: "/admin/invoices" })}>
+            <Button onClick={() => navigate({ to: "/admin/faturas" })}>
               <FileText className="mr-2 h-4 w-4" />
               Faturas Pendentes
             </Button>
