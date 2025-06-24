@@ -36,9 +36,6 @@ const authForgotPasswordLazyImport = createFileRoute(
 const AuthenticatedConfiguracoesRouteLazyImport = createFileRoute(
   '/_authenticated/configuracoes',
 )()
-const AuthenticatedAdminRouteLazyImport = createFileRoute(
-  '/_authenticated/admin',
-)()
 const AuthenticatedOnboardingIndexLazyImport = createFileRoute(
   '/_authenticated/onboarding/',
 )()
@@ -53,6 +50,9 @@ const AuthenticatedChatsIndexLazyImport = createFileRoute(
 )()
 const AuthenticatedCentralDeAjudaIndexLazyImport = createFileRoute(
   '/_authenticated/central-de-ajuda/',
+)()
+const AuthenticatedAdminIndexLazyImport = createFileRoute(
+  '/_authenticated/admin/',
 )()
 const AuthenticatedFaturasInvoiceIdLazyImport = createFileRoute(
   '/_authenticated/faturas/$invoiceId',
@@ -166,15 +166,6 @@ const AuthenticatedConfiguracoesRouteLazyRoute =
     ),
   )
 
-const AuthenticatedAdminRouteLazyRoute =
-  AuthenticatedAdminRouteLazyImport.update({
-    id: '/admin',
-    path: '/admin',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/admin/route.lazy').then((d) => d.Route),
-  )
-
 const authSignInRoute = authSignInImport.update({
   id: '/(auth)/sign-in',
   path: '/sign-in',
@@ -244,6 +235,15 @@ const AuthenticatedCentralDeAjudaIndexLazyRoute =
     ),
   )
 
+const AuthenticatedAdminIndexLazyRoute =
+  AuthenticatedAdminIndexLazyImport.update({
+    id: '/admin/',
+    path: '/admin/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/admin/index.lazy').then((d) => d.Route),
+  )
+
 const AuthenticatedPontosIndexRoute = AuthenticatedPontosIndexImport.update({
   id: '/pontos/',
   path: '/pontos/',
@@ -302,27 +302,27 @@ const AuthenticatedConfiguracoesAparenciaLazyRoute =
 
 const AuthenticatedAdminUsuariosLazyRoute =
   AuthenticatedAdminUsuariosLazyImport.update({
-    id: '/usuarios',
-    path: '/usuarios',
-    getParentRoute: () => AuthenticatedAdminRouteLazyRoute,
+    id: '/admin/usuarios',
+    path: '/admin/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/admin/usuarios.lazy').then((d) => d.Route),
   )
 
 const AuthenticatedAdminFaturasLazyRoute =
   AuthenticatedAdminFaturasLazyImport.update({
-    id: '/faturas',
-    path: '/faturas',
-    getParentRoute: () => AuthenticatedAdminRouteLazyRoute,
+    id: '/admin/faturas',
+    path: '/admin/faturas',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/admin/faturas.lazy').then((d) => d.Route),
   )
 
 const AuthenticatedAdminAnalisesLazyRoute =
   AuthenticatedAdminAnalisesLazyImport.update({
-    id: '/analises',
-    path: '/analises',
-    getParentRoute: () => AuthenticatedAdminRouteLazyRoute,
+    id: '/admin/analises',
+    path: '/admin/analises',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/admin/analises.lazy').then((d) => d.Route),
   )
@@ -358,13 +358,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-in'
       preLoaderRoute: typeof authSignInImport
       parentRoute: typeof rootRoute
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteLazyImport
-      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/configuracoes': {
       id: '/_authenticated/configuracoes'
@@ -438,24 +431,24 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/analises': {
       id: '/_authenticated/admin/analises'
-      path: '/analises'
+      path: '/admin/analises'
       fullPath: '/admin/analises'
       preLoaderRoute: typeof AuthenticatedAdminAnalisesLazyImport
-      parentRoute: typeof AuthenticatedAdminRouteLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/admin/faturas': {
       id: '/_authenticated/admin/faturas'
-      path: '/faturas'
+      path: '/admin/faturas'
       fullPath: '/admin/faturas'
       preLoaderRoute: typeof AuthenticatedAdminFaturasLazyImport
-      parentRoute: typeof AuthenticatedAdminRouteLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
-      path: '/usuarios'
+      path: '/admin/usuarios'
       fullPath: '/admin/usuarios'
       preLoaderRoute: typeof AuthenticatedAdminUsuariosLazyImport
-      parentRoute: typeof AuthenticatedAdminRouteLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/configuracoes/aparencia': {
       id: '/_authenticated/configuracoes/aparencia'
@@ -499,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPontosIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/central-de-ajuda/': {
       id: '/_authenticated/central-de-ajuda/'
       path: '/central-de-ajuda'
@@ -539,24 +539,6 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-interface AuthenticatedAdminRouteLazyRouteChildren {
-  AuthenticatedAdminAnalisesLazyRoute: typeof AuthenticatedAdminAnalisesLazyRoute
-  AuthenticatedAdminFaturasLazyRoute: typeof AuthenticatedAdminFaturasLazyRoute
-  AuthenticatedAdminUsuariosLazyRoute: typeof AuthenticatedAdminUsuariosLazyRoute
-}
-
-const AuthenticatedAdminRouteLazyRouteChildren: AuthenticatedAdminRouteLazyRouteChildren =
-  {
-    AuthenticatedAdminAnalisesLazyRoute: AuthenticatedAdminAnalisesLazyRoute,
-    AuthenticatedAdminFaturasLazyRoute: AuthenticatedAdminFaturasLazyRoute,
-    AuthenticatedAdminUsuariosLazyRoute: AuthenticatedAdminUsuariosLazyRoute,
-  }
-
-const AuthenticatedAdminRouteLazyRouteWithChildren =
-  AuthenticatedAdminRouteLazyRoute._addFileChildren(
-    AuthenticatedAdminRouteLazyRouteChildren,
-  )
-
 interface AuthenticatedConfiguracoesRouteLazyRouteChildren {
   AuthenticatedConfiguracoesAparenciaLazyRoute: typeof AuthenticatedConfiguracoesAparenciaLazyRoute
   AuthenticatedConfiguracoesContaLazyRoute: typeof AuthenticatedConfiguracoesContaLazyRoute
@@ -582,12 +564,15 @@ const AuthenticatedConfiguracoesRouteLazyRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRouteLazyRoute: typeof AuthenticatedAdminRouteLazyRouteWithChildren
   AuthenticatedConfiguracoesRouteLazyRoute: typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAdminAnalisesLazyRoute: typeof AuthenticatedAdminAnalisesLazyRoute
+  AuthenticatedAdminFaturasLazyRoute: typeof AuthenticatedAdminFaturasLazyRoute
+  AuthenticatedAdminUsuariosLazyRoute: typeof AuthenticatedAdminUsuariosLazyRoute
   AuthenticatedFaturasInvoiceIdLazyRoute: typeof AuthenticatedFaturasInvoiceIdLazyRoute
   AuthenticatedCartoesIndexRoute: typeof AuthenticatedCartoesIndexRoute
   AuthenticatedPontosIndexRoute: typeof AuthenticatedPontosIndexRoute
+  AuthenticatedAdminIndexLazyRoute: typeof AuthenticatedAdminIndexLazyRoute
   AuthenticatedCentralDeAjudaIndexLazyRoute: typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   AuthenticatedChatsIndexLazyRoute: typeof AuthenticatedChatsIndexLazyRoute
   AuthenticatedFaturasIndexLazyRoute: typeof AuthenticatedFaturasIndexLazyRoute
@@ -595,15 +580,17 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRouteLazyRoute:
-    AuthenticatedAdminRouteLazyRouteWithChildren,
   AuthenticatedConfiguracoesRouteLazyRoute:
     AuthenticatedConfiguracoesRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAdminAnalisesLazyRoute: AuthenticatedAdminAnalisesLazyRoute,
+  AuthenticatedAdminFaturasLazyRoute: AuthenticatedAdminFaturasLazyRoute,
+  AuthenticatedAdminUsuariosLazyRoute: AuthenticatedAdminUsuariosLazyRoute,
   AuthenticatedFaturasInvoiceIdLazyRoute:
     AuthenticatedFaturasInvoiceIdLazyRoute,
   AuthenticatedCartoesIndexRoute: AuthenticatedCartoesIndexRoute,
   AuthenticatedPontosIndexRoute: AuthenticatedPontosIndexRoute,
+  AuthenticatedAdminIndexLazyRoute: AuthenticatedAdminIndexLazyRoute,
   AuthenticatedCentralDeAjudaIndexLazyRoute:
     AuthenticatedCentralDeAjudaIndexLazyRoute,
   AuthenticatedChatsIndexLazyRoute: AuthenticatedChatsIndexLazyRoute,
@@ -619,7 +606,6 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500LazyRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
-  '/admin': typeof AuthenticatedAdminRouteLazyRouteWithChildren
   '/configuracoes': typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   '/forgot-password': typeof authForgotPasswordLazyRoute
   '/sign-in-2': typeof authSignIn2LazyRoute
@@ -638,6 +624,7 @@ export interface FileRoutesByFullPath {
   '/faturas/$invoiceId': typeof AuthenticatedFaturasInvoiceIdLazyRoute
   '/cartoes': typeof AuthenticatedCartoesIndexRoute
   '/pontos': typeof AuthenticatedPontosIndexRoute
+  '/admin': typeof AuthenticatedAdminIndexLazyRoute
   '/central-de-ajuda': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/configuracoes/': typeof AuthenticatedConfiguracoesIndexLazyRoute
@@ -649,7 +636,6 @@ export interface FileRoutesByTo {
   '/500': typeof errors500LazyRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
-  '/admin': typeof AuthenticatedAdminRouteLazyRouteWithChildren
   '/forgot-password': typeof authForgotPasswordLazyRoute
   '/sign-in-2': typeof authSignIn2LazyRoute
   '/sign-up': typeof authSignUpLazyRoute
@@ -667,6 +653,7 @@ export interface FileRoutesByTo {
   '/faturas/$invoiceId': typeof AuthenticatedFaturasInvoiceIdLazyRoute
   '/cartoes': typeof AuthenticatedCartoesIndexRoute
   '/pontos': typeof AuthenticatedPontosIndexRoute
+  '/admin': typeof AuthenticatedAdminIndexLazyRoute
   '/central-de-ajuda': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesIndexLazyRoute
@@ -680,7 +667,6 @@ export interface FileRoutesById {
   '/(auth)/500': typeof auth500Route
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteLazyRouteWithChildren
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRouteLazyRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordLazyRoute
   '/(auth)/sign-in-2': typeof authSignIn2LazyRoute
@@ -700,6 +686,7 @@ export interface FileRoutesById {
   '/_authenticated/faturas/$invoiceId': typeof AuthenticatedFaturasInvoiceIdLazyRoute
   '/_authenticated/cartoes/': typeof AuthenticatedCartoesIndexRoute
   '/_authenticated/pontos/': typeof AuthenticatedPontosIndexRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexLazyRoute
   '/_authenticated/central-de-ajuda/': typeof AuthenticatedCentralDeAjudaIndexLazyRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexLazyRoute
   '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexLazyRoute
@@ -714,7 +701,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/otp'
     | '/sign-in'
-    | '/admin'
     | '/configuracoes'
     | '/forgot-password'
     | '/sign-in-2'
@@ -733,6 +719,7 @@ export interface FileRouteTypes {
     | '/faturas/$invoiceId'
     | '/cartoes'
     | '/pontos'
+    | '/admin'
     | '/central-de-ajuda'
     | '/chats'
     | '/configuracoes/'
@@ -743,7 +730,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/otp'
     | '/sign-in'
-    | '/admin'
     | '/forgot-password'
     | '/sign-in-2'
     | '/sign-up'
@@ -761,6 +747,7 @@ export interface FileRouteTypes {
     | '/faturas/$invoiceId'
     | '/cartoes'
     | '/pontos'
+    | '/admin'
     | '/central-de-ajuda'
     | '/chats'
     | '/configuracoes'
@@ -772,7 +759,6 @@ export interface FileRouteTypes {
     | '/(auth)/500'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
-    | '/_authenticated/admin'
     | '/_authenticated/configuracoes'
     | '/(auth)/forgot-password'
     | '/(auth)/sign-in-2'
@@ -792,6 +778,7 @@ export interface FileRouteTypes {
     | '/_authenticated/faturas/$invoiceId'
     | '/_authenticated/cartoes/'
     | '/_authenticated/pontos/'
+    | '/_authenticated/admin/'
     | '/_authenticated/central-de-ajuda/'
     | '/_authenticated/chats/'
     | '/_authenticated/configuracoes/'
@@ -857,12 +844,15 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated/route.tsx",
       "children": [
-        "/_authenticated/admin",
         "/_authenticated/configuracoes",
         "/_authenticated/",
+        "/_authenticated/admin/analises",
+        "/_authenticated/admin/faturas",
+        "/_authenticated/admin/usuarios",
         "/_authenticated/faturas/$invoiceId",
         "/_authenticated/cartoes/",
         "/_authenticated/pontos/",
+        "/_authenticated/admin/",
         "/_authenticated/central-de-ajuda/",
         "/_authenticated/chats/",
         "/_authenticated/faturas/",
@@ -877,15 +867,6 @@ export const routeTree = rootRoute
     },
     "/(auth)/sign-in": {
       "filePath": "(auth)/sign-in.tsx"
-    },
-    "/_authenticated/admin": {
-      "filePath": "_authenticated/admin/route.lazy.tsx",
-      "parent": "/_authenticated",
-      "children": [
-        "/_authenticated/admin/analises",
-        "/_authenticated/admin/faturas",
-        "/_authenticated/admin/usuarios"
-      ]
     },
     "/_authenticated/configuracoes": {
       "filePath": "_authenticated/configuracoes/route.lazy.tsx",
@@ -927,15 +908,15 @@ export const routeTree = rootRoute
     },
     "/_authenticated/admin/analises": {
       "filePath": "_authenticated/admin/analises.lazy.tsx",
-      "parent": "/_authenticated/admin"
+      "parent": "/_authenticated"
     },
     "/_authenticated/admin/faturas": {
       "filePath": "_authenticated/admin/faturas.lazy.tsx",
-      "parent": "/_authenticated/admin"
+      "parent": "/_authenticated"
     },
     "/_authenticated/admin/usuarios": {
       "filePath": "_authenticated/admin/usuarios.lazy.tsx",
-      "parent": "/_authenticated/admin"
+      "parent": "/_authenticated"
     },
     "/_authenticated/configuracoes/aparencia": {
       "filePath": "_authenticated/configuracoes/aparencia.lazy.tsx",
@@ -959,6 +940,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/pontos/": {
       "filePath": "_authenticated/pontos/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/admin/": {
+      "filePath": "_authenticated/admin/index.lazy.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/central-de-ajuda/": {

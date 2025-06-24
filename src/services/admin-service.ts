@@ -19,14 +19,14 @@ export const adminService = {
     status?: 'Ativo' | 'Inativo' | 'all'
     sort_by?: 'name' | 'email' | 'created_at' | 'last_login'
     sort_order?: 'asc' | 'desc'
-  }) => api.get('/admin/users', { params }),
+  }) => api.get('/admin/usuarios', { params }),
 
   // Obter detalhes de um usuário específico
-  getUserDetails: (userId: string) => api.get(`/admin/users/${userId}`),
+  getUserDetails: (userId: string) => api.get(`/admin/usuarios/${userId}`),
 
   // Atualizar status de usuário
   updateUserStatus: (userId: string, status: 'Ativo' | 'Inativo') => 
-    api.patch(`/admin/users/${userId}/status`, { status }),
+    api.patch(`/admin/usuarios/${userId}/status`, { status }),
 
   // Obter faturas pendentes
   getPendingInvoices: (params?: {

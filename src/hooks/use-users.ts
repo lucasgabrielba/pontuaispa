@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { userService } from '@/services/user-service'
-import { toast } from '@/hooks/use-toast'
 
 export type UserFormData = {
   name: string
@@ -16,6 +15,7 @@ export type User = {
   name: string
   email: string
   status: string
+  role?: string
   created_at: string
   updated_at: string
 }
@@ -43,26 +43,33 @@ export type UsersResponse = {
 export const useUsers = () => {
   const queryClient = useQueryClient()
 
-  // Fetch all users with pagination
-  const getUsers = (page = 1, perPage = 15) => {
+  // Fetch all users with pagination and search
+  const getUsers = (page = 1, perPage = 15, search = '') => {
     return useQuery({
-      queryKey: ['users', page, perPage],
+      queryKey: ['users', page, perPage, search],
       queryFn: async () => {
-        const response = await userService.getAll({ page, per_page: perPage })
+        const params: any = { page, per_page: perPage }
+        if (search) {
+          params.search = search
+        }
+        
+        const response = await userService.getAll(params)
         return response.data as UsersResponse
-      }
+      },
+      staleTime: 1000 * 60 * 5, // 5 minutos
     })
   }
 
   // Get user by ID
-  const getUser = (id: string) => {
+  const getUser = (id: string, options?: { enabled?: boolean }) => {
     return useQuery({
       queryKey: ['users', id],
       queryFn: async () => {
         const response = await userService.getById(id)
         return response.data as User
       },
-      enabled: !!id // Only run if ID is provided
+      enabled: options?.enabled ?? !!id,
+      staleTime: 1000 * 60 * 5,
     })
   }
 
@@ -75,20 +82,8 @@ export const useUsers = () => {
     onSuccess: () => {
       // Invalidate and refetch users list
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      
-      toast({
-        title: 'Usuário criado com sucesso',
-        description: 'O novo usuário foi adicionado ao sistema'
-      })
     },
-    onError: (error: any) => {
-      console.error('Erro ao criar usuário:', error)
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao criar usuário',
-        description: error.response?.data?.message || 'Não foi possível criar o usuário'
-      })
-    }
+    // Remove o toast do hook - será tratado no componente
   })
 
   // Update an existing user
@@ -101,20 +96,8 @@ export const useUsers = () => {
       // Invalidate and refetch users list and the specific user
       queryClient.invalidateQueries({ queryKey: ['users'] })
       queryClient.invalidateQueries({ queryKey: ['users', variables.id] })
-      
-      toast({
-        title: 'Usuário atualizado com sucesso',
-        description: 'As informações do usuário foram atualizadas'
-      })
     },
-    onError: (error: any) => {
-      console.error('Erro ao atualizar usuário:', error)
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao atualizar usuário',
-        description: error.response?.data?.message || 'Não foi possível atualizar o usuário'
-      })
-    }
+    // Remove o toast do hook - será tratado no componente
   })
 
   // Delete a user
@@ -126,20 +109,8 @@ export const useUsers = () => {
     onSuccess: () => {
       // Invalidate and refetch users list
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      
-      toast({
-        title: 'Usuário removido com sucesso',
-        description: 'O usuário foi removido do sistema'
-      })
     },
-    onError: (error: any) => {
-      console.error('Erro ao remover usuário:', error)
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao remover usuário',
-        description: error.response?.data?.message || 'Não foi possível remover o usuário'
-      })
-    }
+    // Remove o toast do hook - será tratado no componente
   })
 
   return {

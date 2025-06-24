@@ -229,7 +229,7 @@ export function InvoiceDetails() {
 
   const totalPoints = useMemo(() => {
     if (!transactionsData?.data) return 0;
-    return transactionsData.data.reduce((sum, tx) => sum + (tx.points_earned || 0), 0);
+    return transactionsData.data.reduce((sum: number, tx: any) => sum + (tx.points_earned || 0), 0);
   }, [transactionsData]);
 
   const avgPointsPerTransaction = useMemo(() => {

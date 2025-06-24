@@ -388,7 +388,7 @@ const adminTopNav = [
   },
   {
     title: 'Usuários',
-    href: '/admin/users',
+    href: '/admin/usuarios',
     isActive: false,
     disabled: false,
   },
