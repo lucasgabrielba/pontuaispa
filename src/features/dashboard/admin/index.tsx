@@ -67,7 +67,7 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div className='flex items-center space-x-2'>
-            <Button variant="outline" onClick={() => navigate({ to: "/admin/users" })}>
+            <Button variant="outline" onClick={() => navigate({ to: "/admin/usuarios" })}>
               <Users className="mr-2 h-4 w-4" />
               Gerenciar Usuários
             </Button>

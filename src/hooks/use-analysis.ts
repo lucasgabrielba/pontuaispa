@@ -1,4 +1,3 @@
-// src/hooks/use-analysis.ts
 import { useQuery } from '@tanstack/react-query'
 import { 
   analysisService, 

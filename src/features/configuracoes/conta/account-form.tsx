@@ -29,7 +29,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
-  const { updateUsuario } = useUsers()
+  const { updateUser } = useUsers()
   const user = useAuthStore(state => state.auth.user)
   const setUser = useAuthStore(state => state.auth.setUser)
 
@@ -44,7 +44,7 @@ export function AccountForm() {
 
   async function onSubmit(data: AccountFormValues) {
     try {
-      await updateUsuario.mutateAsync({ id: user!.id, data })
+      await updateUser.mutateAsync({ id: user!.id, data })
       // Atualizar o state local do usuário após sucesso
       if (user) {
         setUser({
@@ -79,9 +79,9 @@ export function AccountForm() {
         />
         <Button
           type='submit'
-          disabled={updateUsuario.isPending}
+          disabled={updateUser.isPending}
         >
-          {updateUsuario.isPending ? 'Atualizando...' : 'Atualizar Conta'}
+          {updateUser.isPending ? 'Atualizando...' : 'Atualizar Conta'}
         </Button>
       </form>
     </Form>

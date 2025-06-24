@@ -4,10 +4,10 @@ import { ProfileDropdown } from "@/components/profile-dropdown"
 import { Search } from "@/components/search"
 import { ThemeSwitch } from "@/components/theme-switch"
 import { Button } from "@/components/ui/button"
-import { Card as CardUI, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card as CardUI, CardContent, CardHeader } from "@/components/ui/card"
 import { IconCreditCard, IconPlus, IconAlertCircle } from "@tabler/icons-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -29,11 +29,11 @@ import { CardRecommendationsComponent } from "./components/card-recommendations"
 export default function CardsPage() {
   const {
     cards,
-    recommendedCards,
+    // recommendedCards,
     rewardPrograms,
     banks,
     isLoadingCards,
-    isLoadingRecommendedCards,
+    // isLoadingRecommendedCards,
     isLoadingRewardPrograms,
     isLoadingBanks,
     isCardFormDialogOpen,
@@ -198,30 +198,30 @@ function CardSkeleton() {
   )
 }
 
-interface RecommendedCardComponentProps {
-  card: any
-}
+// interface RecommendedCardComponentProps {
+//   card: any
+// }
 
-function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
-  return (
-    <div className="rounded-lg border p-4 flex flex-col">
-      <div className="flex justify-between items-start mb-2">
-        <div className="font-semibold">{card.name}</div>
-        <Badge variant="secondary">{card.bank}</Badge>
-      </div>
-      <div className="text-sm mb-4">{card.description}</div>
-      <div className="text-sm mb-2">
-        <span className="font-medium">Vantagens:</span> {card.benefits}
-      </div>
-      <div className="mt-auto pt-4 flex justify-between items-center">
-        <div className="text-primary font-semibold">{card.potential_increase}% mais pontos</div>
-        <Button variant="outline" size="sm">
-          Detalhes
-        </Button>
-      </div>
-    </div>
-  )
-}
+// function RecommendedCardComponent({ card }: RecommendedCardComponentProps) {
+//   return (
+//     <div className="rounded-lg border p-4 flex flex-col">
+//       <div className="flex justify-between items-start mb-2">
+//         <div className="font-semibold">{card.name}</div>
+//         <Badge variant="secondary">{card.bank}</Badge>
+//       </div>
+//       <div className="text-sm mb-4">{card.description}</div>
+//       <div className="text-sm mb-2">
+//         <span className="font-medium">Vantagens:</span> {card.benefits}
+//       </div>
+//       <div className="mt-auto pt-4 flex justify-between items-center">
+//         <div className="text-primary font-semibold">{card.potential_increase}% mais pontos</div>
+//         <Button variant="outline" size="sm">
+//           Detalhes
+//         </Button>
+//       </div>
+//     </div>
+//   )
+// }
 
 interface EmptyStateProps {
   title: string
