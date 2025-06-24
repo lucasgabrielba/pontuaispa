@@ -88,7 +88,6 @@ export default function AdminDashboard() {
               <TabsTrigger value='overview'>Visão Geral</TabsTrigger>
               <TabsTrigger value='users'>Usuários</TabsTrigger>
               <TabsTrigger value='invoices'>Faturas</TabsTrigger>
-              <TabsTrigger value='analytics'>Analytics</TabsTrigger>
             </TabsList>
           </div>
           
@@ -284,94 +283,6 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
-
-          <TabsContent value='analytics' className='space-y-4'>
-            <div className='grid gap-6'>
-              <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-                <Card>
-                  <CardHeader className='pb-2'>
-                    <CardTitle className='text-base'>Taxa de Conversão</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className='text-2xl font-bold text-green-600'>
-                      {stats?.conversionRate || 0}%
-                    </div>
-                    <p className='text-xs text-muted-foreground'>
-                      Visitantes que se cadastram
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className='pb-2'>
-                    <CardTitle className='text-base'>Engagement</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className='text-2xl font-bold text-blue-600'>
-                      {stats?.avgInvoicesPerUser || 0}
-                    </div>
-                    <p className='text-xs text-muted-foreground'>
-                      Faturas por usuário/mês
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className='pb-2'>
-                    <CardTitle className='text-base'>Tempo Médio</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className='text-2xl font-bold text-purple-600'>
-                      {stats?.avgProcessingTime || 0}min
-                    </div>
-                    <p className='text-xs text-muted-foreground'>
-                      Processamento de faturas
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Métricas de Desempenho</CardTitle>
-                  <CardDescription>
-                    Indicadores chave de performance da plataforma
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className='space-y-4'>
-                    <div className='grid gap-4 md:grid-cols-2'>
-                      <div className='space-y-2'>
-                        <div className='flex justify-between text-sm'>
-                          <span>Usuários Ativos (30d)</span>
-                          <span className='font-medium'>{stats?.activeUsers || 0}</span>
-                        </div>
-                        <div className='h-2 w-full bg-secondary rounded-full overflow-hidden'>
-                          <div 
-                            className='h-full bg-primary rounded-full transition-all'
-                            style={{ width: `${((stats?.activeUsers || 0) / (stats?.totalUsers || 1)) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className='space-y-2'>
-                        <div className='flex justify-between text-sm'>
-                          <span>Taxa de Sucesso IA</span>
-                          <span className='font-medium'>{stats?.aiSuccessRate || 0}%</span>
-                        </div>
-                        <div className='h-2 w-full bg-secondary rounded-full overflow-hidden'>
-                          <div 
-                            className='h-full bg-green-500 rounded-full transition-all'
-                            style={{ width: `${stats?.aiSuccessRate || 0}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
         </Tabs>
       </Main>
     </>
@@ -394,19 +305,13 @@ const adminTopNav = [
   },
   {
     title: 'Faturas',
-    href: '/admin/invoices',
-    isActive: false,
-    disabled: false,
-  },
-  {
-    title: 'Analytics',
-    href: '/admin/analytics',
+    href: '/admin/faturas',
     isActive: false,
     disabled: false,
   },
   {
     title: 'Configurações',
-    href: '/admin/settings',
+    href: '/configuracoes/conta',
     isActive: false,
     disabled: false,
   },

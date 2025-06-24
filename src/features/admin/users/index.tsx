@@ -395,19 +395,13 @@ const adminTopNav = [
   },
   {
     title: 'Faturas',
-    href: '/admin/invoices',
-    isActive: false,
-    disabled: false,
-  },
-  {
-    title: 'Analytics',
-    href: '/admin/analytics',
+    href: '/admin/faturas',
     isActive: false,
     disabled: false,
   },
   {
     title: 'Configurações',
-    href: '/admin/settings',
+    href: '/configuracoes/conta',
     isActive: false,
     disabled: false,
   },

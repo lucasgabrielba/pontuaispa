@@ -613,14 +613,8 @@ const adminTopNav = [
     disabled: false,
   },
   {
-    title: 'Analytics',
-    href: '/admin/analytics',
-    isActive: false,
-    disabled: false,
-  },
-  {
     title: 'Configurações',
-    href: '/admin/settings',
+    href: '/configuracoes/conta',
     isActive: false,
     disabled: false,
   },
