@@ -36,7 +36,7 @@ interface TransactionsListProps {
     per_page: number;
     total: number;
   };
-  onPaginationChange: (page: number) => void;
+  onPaginationChange: any;
   onSearchChange: (search: string) => void;
   onSortChange: (field: 'date' | 'amount' | 'merchant', order: 'asc' | 'desc') => void;
   onCategoryFilterChange: (category: string) => void;

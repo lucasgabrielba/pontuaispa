@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
@@ -17,9 +16,6 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { 
   Users, 
   FileText, 
-  CheckCircle, 
-  AlertTriangle,
-  Brain,
   Download
 } from 'lucide-react'
 import { useAdminDashboard } from '@/hooks/use-admin-dashboard'
@@ -27,7 +23,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { AdminOverview } from './components/admin-overview'
-import { SystemHealthCard } from './components/system-health-card'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -35,9 +30,7 @@ export default function AdminDashboard() {
   // Hook customizado para dados administrativos
   const { 
     stats, 
-    users, 
     pendingInvoices,
-    systemHealth,
     isLoading 
   } = useAdminDashboard()
 
@@ -46,9 +39,9 @@ export default function AdminDashboard() {
       {/* ===== Header ===== */}
       <Header>
         <TopNav links={adminTopNav} />
-        <div className='ml-auto flex items-center space-x-4'>
+        <div className='ml-auto flex flex-wrap items-center gap-2 sm:gap-4'>
           <Search />
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="hidden lg:block">
             <Download className="mr-2 h-4 w-4" />
             Relatório
           </Button>
@@ -59,14 +52,14 @@ export default function AdminDashboard() {
 
       {/* ===== Main ===== */}
       <Main>
-        <div className='mb-6 flex items-center justify-between'>
+        <div className='mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
           <div>
-            <h1 className='text-3xl font-bold tracking-tight'>Painel Administrativo</h1>
-            <p className='text-muted-foreground'>
+            <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Painel Administrativo</h1>
+            <p className='text-muted-foreground text-sm sm:text-base'>
               Visão geral da plataforma Pontu AI - {format(new Date(), "dd 'de' MMMM, yyyy", { locale: pt })}
             </p>
           </div>
-          <div className='flex items-center space-x-2'>
+          <div className='flex flex-wrap items-center gap-2'>
             <Button variant="outline" onClick={() => navigate({ to: "/admin/usuarios" })}>
               <Users className="mr-2 h-4 w-4" />
               Gerenciar Usuários
@@ -78,27 +71,14 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <Tabs
-          orientation='vertical'
-          defaultValue='overview'
-          className='space-y-4'
-        >
-          <div className='w-full overflow-x-auto pb-2'>
-            <TabsList>
-              <TabsTrigger value='overview'>Visão Geral</TabsTrigger>
-              <TabsTrigger value='users'>Usuários</TabsTrigger>
-              <TabsTrigger value='invoices'>Faturas</TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <TabsContent value='overview' className='space-y-6'>
+        {/* Visão Geral e Tarefas do Admin */}
+        <div className='space-y-6'>
             {/* Cards de Estatísticas */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'>
+              {/* Card: Total de Usuários */}
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Total de Usuários
-                  </CardTitle>
+                  <CardTitle className='text-sm font-medium'>Total de Usuários</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -115,175 +95,71 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
               
+              {/* Card: Faturas aguardando análise */}
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Faturas Pendentes
-                  </CardTitle>
-                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                  <CardTitle className='text-sm font-medium'>Faturas aguardando análise</CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
                     <Skeleton className="h-8 w-24" />
                   ) : (
-                    <div className='text-2xl font-bold text-amber-600'>
-                      {stats?.pendingInvoices || 0}
+                    <div className='text-2xl font-bold'>
+                      {stats?.pendingInvoices?.toLocaleString() || 0}
                     </div>
                   )}
-                  <p className='text-xs text-muted-foreground'>
-                    Aguardando análise
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Faturas Processadas
-                  </CardTitle>
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-24" />
-                  ) : (
-                    <div className='text-2xl font-bold text-green-600'>
-                      {stats?.processedInvoices || 0}
-                    </div>
-                  )}
-                  <p className='text-xs text-muted-foreground'>
-                    Neste mês
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Recomendações Geradas
-                  </CardTitle>
-                  <Brain className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <Skeleton className="h-8 w-24" />
-                  ) : (
-                    <div className='text-2xl font-bold text-primary'>
-                      {stats?.recommendationsGenerated || 0}
-                    </div>
-                  )}
-                  <p className='text-xs text-muted-foreground'>
-                    +{stats?.recommendationsGrowth || 0}% vs mês anterior
-                  </p>
+                  <p className='text-xs text-muted-foreground'>Faturas aguardando análise manual</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Gráficos e Tabelas */}
-            <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
-              <Card className='lg:col-span-2'>
-                <CardHeader>
-                  <CardTitle>Processamento de Faturas</CardTitle>
-                  <CardDescription>
-                    Volume de faturas processadas nos últimos 30 dias
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <AdminOverview 
-                    data={stats?.invoiceProcessingChart} 
-                    isLoading={isLoading} 
-                  />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Status do Sistema</CardTitle>
-                  <CardDescription>
-                    Saúde dos serviços da plataforma
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <SystemHealthCard 
-                    data={systemHealth} 
-                    isLoading={isLoading} 
-                  />
-                </CardContent>
-              </Card>
-            </div>
+          {/* Linha 2: Gráfico de volume de faturas */}
+          <div className='grid gap-4 grid-cols-1'>
+            <Card>
+              <CardHeader>
+                <CardTitle>Volume de Faturas</CardTitle>
+                <CardDescription>
+                  Volume de faturas processadas nos últimos 30 dias
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminOverview 
+                  data={stats?.invoiceProcessingChart} 
+                  isLoading={isLoading} 
+                />
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* Usuários Recentes e Faturas Críticas */}
-            <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Novos Usuários</CardTitle>
-                  <CardDescription>
-                    Últimos usuários cadastrados na plataforma
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* <UsersTable 
-                    users={users?.slice(0, 5)} 
-                    isLoading={isLoading}
-                    showActions={false}
-                  /> */}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Faturas Críticas</CardTitle>
-                  <CardDescription>
-                    Faturas com problemas ou há mais tempo na fila
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* <PendingInvoicesTable 
-                    invoices={pendingInvoices?.filter(inv => inv.priority === 'high')?.slice(0, 5)} 
-                    isLoading={isLoading}
-                    compact={true}
-                  /> */}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value='users' className='space-y-4'>
+          {/* Linha 3: Lista de tarefas pendentes */}
+          <div className='grid grid-cols-1 gap-6'>
             <Card>
               <CardHeader>
-                <CardTitle>Gestão de Usuários</CardTitle>
-                <CardDescription>
-                  Visualize e gerencie todos os usuários da plataforma
-                </CardDescription>
+                <CardTitle>Faturas aguardando análise</CardTitle>
+                <CardDescription>Últimas faturas enviadas por usuários e aguardando análise manual do admin</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* <UsersTable 
-                  users={users} 
-                  isLoading={isLoading}
-                  showActions={true}
-                /> */}
+                {/* TODO: Substituir pelo componente real de tabela no futuro */}
+                {isLoading ? (
+                  <Skeleton className="h-16 w-full" />
+                ) : (
+                  <ul className="space-y-2">
+                    {(pendingInvoices?.slice(0, 5) || []).map((inv: any) => (
+                      <li key={inv.id} className="flex items-center justify-between">
+                        <span>
+                          {inv.userName} - {inv.cardName} <span className="text-xs text-muted-foreground">{inv.createdAt ? (() => { try { return `(${format(new Date(inv.createdAt), 'dd/MM/yyyy')})` } catch { return '(data inválida)' } })() : '(data indisponível)'}</span>
+                        </span>
+                        <Button size="sm" variant="outline" onClick={() => navigate({ to: `/admin/faturas/${inv.id}` })}>Analisar</Button>
+                      </li>
+                    ))}
+                    {(!pendingInvoices || pendingInvoices.length === 0) && <span className="text-xs text-muted-foreground">Nenhuma fatura pendente</span>}
+                  </ul>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value='invoices' className='space-y-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle>Faturas Pendentes</CardTitle>
-                <CardDescription>
-                  Faturas aguardando processamento e análise
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* <PendingInvoicesTable 
-                  invoices={pendingInvoices} 
-                  isLoading={isLoading}
-                  compact={false}
-                /> */}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </Main>
     </>
   )

@@ -198,27 +198,26 @@ export function UserDialog({ open, onOpenChange, mode, userId }: UserDialogProps
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="w-full max-w-full sm:max-w-md md:max-w-lg p-4 sm:p-6">
         <SheetHeader>
           <SheetTitle>
-            {mode === 'create' ? 'Criar Novo Usuário' : 'Editar Usuário'}
+            {mode === 'create' ? 'Novo Usuário' : 'Editar Usuário'}
           </SheetTitle>
           <SheetDescription>
-            {mode === 'create' 
-              ? 'Preencha os dados para criar um novo usuário no sistema.'
-              : 'Altere os dados do usuário. Deixe a senha em branco para mantê-la inalterada.'
-            }
+            {mode === 'create'
+              ? 'Preencha os dados para cadastrar um novo usuário.'
+              : 'Altere as informações desejadas e salve.'}
           </SheetDescription>
         </SheetHeader>
 
-        {mode === 'edit' && isLoadingUser ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Carregando dados do usuário...</span>
+        {isLoadingUser && mode === 'edit' ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+
               <FormField
                 control={form.control}
                 name="name"
@@ -367,16 +366,17 @@ export function UserDialog({ open, onOpenChange, mode, userId }: UserDialogProps
                 )}
               />
 
-              <div className="flex justify-end space-x-2 pt-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end sm:space-x-2 pt-4">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => onOpenChange(false)}
                   disabled={isSubmitting}
+                  className="w-full sm:w-auto"
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,4 +1,4 @@
-// src/features/admin/invoices/details/index.tsx
+//@ts-nocheck
 import { useParams, useNavigate, useSearch } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'

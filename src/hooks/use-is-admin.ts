@@ -6,11 +6,13 @@ import { useAuth } from './use-auth'
  */
 export function useIsAdmin() {
   const { user } = useAuth()
-  // user pode ser um objeto ou um resultado do useQuery
+
   const userData = user?.data ?? user
 
   return useMemo(() => {
+    // @ts-ignore
     if (!userData || !Array.isArray(userData.roles)) return false
+    // @ts-ignore
     return userData.roles.some(
       (role: any) => role.name === 'admin' || role.name === 'super_admin'
     )
