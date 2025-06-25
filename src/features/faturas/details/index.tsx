@@ -9,17 +9,19 @@ import { Search } from "@/components/search"
 import { ThemeSwitch } from "@/components/theme-switch"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { IconArrowLeft, IconFileText, IconCreditCard, IconDownload } from "@tabler/icons-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { IconArrowLeft, IconFileText, IconCreditCard, IconDownload, IconChartBar, IconBulb, IconList } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { IconAlertCircle } from "@tabler/icons-react"
 import { CategoryIcon } from '@/components/category-icon'
 import { TransactionsList } from './components/transactions-list'
+import { SuggestionSheet } from './components/suggestion-sheet'
+import { SuggestionsSection } from './components/suggestions-section'
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { invoicesService } from '@/services/invoices-service'
-import { TransactionOptimizationsComponent } from '../upload/components/transaction-optimizations'
 
 // Definir os parâmetros de pesquisa para a rota
 interface SearchParams {
@@ -28,6 +30,7 @@ interface SearchParams {
   sortField?: 'date' | 'amount' | 'merchant';
   sortOrder?: 'asc' | 'desc';
   category?: string;
+  tab?: string;
 }
 
 // Função para converter valores inteiros em valores reais
@@ -35,16 +38,22 @@ function convertIntToDecimal(intValue: number): number {
   return intValue / 100;
 }
 
+interface InvoiceDetailsProps {
+  invoiceId?: string;
+}
+
+import { useLocation } from '@tanstack/react-router';
+
 export function InvoiceDetails() {
   const navigate = useNavigate();
-  const params = useParams({ from: '/_authenticated/faturas/$invoiceId' });
+  const location = useLocation();
+  const isAdmin = location.pathname.includes('/admin/');
+  const params = useParams({ from: isAdmin ? '/_authenticated/admin/faturas/$invoiceId' : '/_authenticated/faturas/$invoiceId' });
   const invoiceId = params.invoiceId;
-  
+
   // Obter parâmetros da URL
-  const searchParams = useSearch<SearchParams>({ from: '/_authenticated/faturas/$invoiceId' });
-  
-  console.log('URL Search Params:', searchParams);
-  
+  const searchParams = useSearch<SearchParams>({ from: isAdmin ? '/_authenticated/admin/faturas/$invoiceId' : '/_authenticated/faturas/$invoiceId' });
+
   // Estados iniciais baseados nos parâmetros da URL
   const [filterParams, setFilterParams] = useState({
     page: parseInt(searchParams?.page || '1'),
@@ -54,22 +63,24 @@ export function InvoiceDetails() {
     sortOrder: (searchParams?.sortOrder || 'desc') as 'asc' | 'desc',
     categoryFilter: searchParams?.category || 'all'
   });
-  
+
+  // Estado da aba ativa
+  const [activeTab, setActiveTab] = useState(searchParams?.tab || 'transactions');
+
   // Atualizar os parâmetros de filtro na URL
-  const updateUrlParams = useCallback((newParams: Partial<typeof filterParams>) => {
+  const updateUrlParams = useCallback((newParams: Partial<typeof filterParams & { tab?: string }>) => {
     const currentParams = { ...filterParams, ...newParams };
-    
+
     const urlSearchParams: SearchParams = {};
-    
+
     // Adicionar apenas parâmetros com valores não padrão na URL
     if (currentParams.page !== 1) urlSearchParams.page = currentParams.page.toString();
     if (currentParams.search) urlSearchParams.search = currentParams.search;
     if (currentParams.sortField !== 'date') urlSearchParams.sortField = currentParams.sortField;
     if (currentParams.sortOrder !== 'desc') urlSearchParams.sortOrder = currentParams.sortOrder;
     if (currentParams.categoryFilter !== 'all') urlSearchParams.category = currentParams.categoryFilter;
-    
-    console.log('Atualizando URL:', urlSearchParams);
-    
+    if (newParams.tab && newParams.tab !== 'transactions') urlSearchParams.tab = newParams.tab;
+
     // Navegar para a mesma rota com os novos parâmetros de consulta
     navigate({
       to: '/faturas/$invoiceId',
@@ -78,21 +89,24 @@ export function InvoiceDetails() {
       replace: true // Substituir em vez de adicionar ao histórico
     });
   }, [filterParams, invoiceId, navigate]);
-  
+
   // Função para atualizar os parâmetros de filtro
   const updateParams = useCallback((newParams: Partial<typeof filterParams>) => {
-    console.log('Atualizando parâmetros:', newParams);
-    
     setFilterParams(prev => {
       const updated = { ...prev, ...newParams };
-      console.log('Parâmetros atualizados:', updated);
       return updated;
     });
-    
+
     // Atualizar os parâmetros na URL
     updateUrlParams(newParams);
   }, [updateUrlParams]);
-  
+
+  // Função para mudar de aba
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab);
+    updateUrlParams({ tab });
+  }, [updateUrlParams]);
+
   // Efeito para sincronizar o estado local com os parâmetros da URL quando mudam
   useEffect(() => {
     const page = parseInt(searchParams?.page || '1');
@@ -100,16 +114,17 @@ export function InvoiceDetails() {
     const sortField = (searchParams?.sortField || 'date') as 'date' | 'amount' | 'merchant';
     const sortOrder = (searchParams?.sortOrder || 'desc') as 'asc' | 'desc';
     const categoryFilter = searchParams?.category || 'all';
-    
+    const tab = searchParams?.tab || 'transactions';
+
     // Verificar se os parâmetros da URL são diferentes dos locais
     if (
       page !== filterParams.page ||
       search !== filterParams.search ||
       sortField !== filterParams.sortField ||
       sortOrder !== filterParams.sortOrder ||
-      categoryFilter !== filterParams.categoryFilter
+      categoryFilter !== filterParams.categoryFilter ||
+      tab !== activeTab
     ) {
-      console.log('Sincronizando estado com parâmetros da URL');
       setFilterParams({
         page,
         perPage: 15,
@@ -118,8 +133,9 @@ export function InvoiceDetails() {
         sortOrder,
         categoryFilter
       });
+      setActiveTab(tab);
     }
-  }, [searchParams, filterParams]);
+  }, [searchParams, filterParams, activeTab]);
 
   // Converter parâmetros para formato da API
   const getApiParams = useCallback(() => {
@@ -153,7 +169,7 @@ export function InvoiceDetails() {
   // Transformação dos dados da API para o formato correto
   const transformedInvoice = useMemo(() => {
     if (!invoice) return null;
-    
+
     return {
       ...invoice,
       total_amount: convertIntToDecimal(invoice.total_amount),
@@ -168,11 +184,8 @@ export function InvoiceDetails() {
     queryKey: ['invoice-transactions', invoiceId, filterParams],
     queryFn: () => {
       const apiParams = getApiParams();
-      console.log('Executando consulta com parâmetros:', apiParams);
       return invoicesService.getInvoiceTransactions(invoiceId, apiParams)
         .then(res => {
-          console.log('Resposta da API:', res.data);
-          
           // Transformar os valores inteiros em decimais
           const transformedData = {
             ...res.data,
@@ -183,7 +196,7 @@ export function InvoiceDetails() {
               points_earned: tx.points_earned
             }))
           };
-          
+
           return transformedData;
         });
     },
@@ -203,7 +216,7 @@ export function InvoiceDetails() {
   // Transformação do resumo de categorias para valores decimais
   const summaryByCategory = useMemo(() => {
     if (!summaryByCategoryRaw) return null;
-    
+
     return summaryByCategoryRaw.map((category: any) => ({
       ...category,
       total: convertIntToDecimal(category.total)
@@ -238,11 +251,6 @@ export function InvoiceDetails() {
     return (totalPoints / transactionsData.data.length).toFixed(1);
   }, [transactionsData, totalPoints]);
 
-  const hasRecommendedTransactions = useMemo(() => {
-    if (!transactionsData?.data) return false;
-    return transactionsData.data.some((tx: any) => tx.is_recommended);
-  }, [transactionsData]);
-
   // Estado de carregamento e erro
   const isLoading = isLoadingInvoice || isLoadingTransactions || isLoadingSummary;
   const error = invoiceError || transactionsError || summaryError;
@@ -273,22 +281,18 @@ export function InvoiceDetails() {
 
   // Manipuladores de eventos
   const handlePaginationChange = useCallback((page: any) => {
-    console.log('Solicitando mudança para página:', page);
     updateParams({ page });
   }, [updateParams]);
 
   const handleSearchChange = useCallback((search: string) => {
-    console.log('Solicitando busca:', search);
     updateParams({ search, page: 1 });
   }, [updateParams]);
 
   const handleSortChange = useCallback((field: string, order: string) => {
-    console.log('Solicitando ordenação:', field, order);
     updateParams({ sortField: field as 'date' | 'amount' | 'merchant', sortOrder: order as 'desc' | 'asc' });
   }, [updateParams]);
 
   const handleCategoryFilterChange = useCallback((category: string) => {
-    console.log('Solicitando filtro de categoria:', category);
     updateParams({ categoryFilter: category, page: 1 });
   }, [updateParams]);
 
@@ -354,8 +358,15 @@ export function InvoiceDetails() {
                   <IconDownload className="mr-2 h-4 w-4" />
                   Baixar PDF
                 </Button>
+                {isAdmin && (
+                  <SuggestionSheet 
+                    invoiceId={invoiceId} 
+                    className="bg-primary text-primary-foreground"
+                  />
+                )}
               </div>
             </div>
+            
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
               <Card>
                 <CardHeader className="pb-2">
@@ -399,118 +410,119 @@ export function InvoiceDetails() {
                   </p>
                 </CardContent>
               </Card>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-3 mb-6">
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Transações</CardTitle>
-                  <CardDescription>
-                    Lista de todas as transações da fatura
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {transactionsData && (
-                    <TransactionsList
-                      transactions={transactionsData}
-                      onPaginationChange={handlePaginationChange}
-                      onSearchChange={handleSearchChange}
-                      onSortChange={handleSortChange}
-                      onCategoryFilterChange={handleCategoryFilterChange}
-                      sortField={filterParams.sortField}
-                      sortOrder={filterParams.sortOrder}
-                      categoryFilter={filterParams.categoryFilter}
-                      categories={categories}
-                    />
-                  )}
-                </CardContent>
-              </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Resumo por Categoria</CardTitle>
-                  <CardDescription>
-                    Distribuição de gastos por categoria
-                  </CardDescription>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Data de Referência</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {summaryByCategory?.length === 0 ? (
-                      <div className="text-center text-muted-foreground py-8">
-                        Nenhuma categoria disponível
-                      </div>
-                    ) : (
-                      summaryByCategory?.map((category: any) => (
-                        <div key={category.id || 'uncategorized'} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <CategoryIcon
-                                iconName={category.icon || 'help-circle'}
-                                color={category.color || 'gray'}
-                                size={16}
-                              />
-                              <span className="font-medium">{category.name}</span>
-                            </div>
-                            <span className="font-medium">
-                              R$ {category.total.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary rounded-full"
-                              style={{
-                                width: `${(category.total / totalAmount) * 100}%`,
-                                backgroundColor: category.color ? `hsl(var(--${category.color}))` : undefined
-                              }}
-                            />
-                          </div>
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>{category.count} transações</span>
-                            <span>{category.points.toLocaleString()} pontos</span>
-                          </div>
-                        </div>
-                      ))
-                    )}
+                <CardContent className="pt-1">
+                  <div className="text-xl font-bold">
+                    {formatDate(transformedInvoice?.reference_date)}
                   </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Vencimento: {formatDate(transformedInvoice?.due_date)}
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>Oportunidades de Pontos</CardTitle>
-                <CardDescription>
-                  Como você poderia ter acumulado mais pontos nesta fatura
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {hasRecommendedTransactions ? (
-                  <div className="space-y-4">
-                    <Alert>
-                      <IconAlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Você poderia ter acumulado até <strong>30% mais pontos</strong> usando cartões mais adequados para suas categorias de gastos.
-                      </AlertDescription>
-                    </Alert>
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+              <TabsList className="w-auto">
+                <TabsTrigger value="transactions" className="flex items-center gap-2">
+                  <IconList size={16} />
+                  Transações
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center gap-2">
+                  <IconChartBar size={16} />
+                  Análises
+                </TabsTrigger>
+                <TabsTrigger value="suggestions" className="flex items-center gap-2">
+                  <IconBulb size={16} />
+                  Sugestões
+                </TabsTrigger>
+              </TabsList>
 
-                    <div className="space-y-2">
-                      <p className="font-medium">Recomendações:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Use o cartão <strong>Nubank Platinum</strong> para gastos em Restaurantes (2x mais pontos)</li>
-                        <li>Use o cartão <strong>Itaú Personnalité</strong> para gastos em Supermercados (1.8x mais pontos)</li>
-                        <li>Considere adicionar o <strong>Santander Select</strong> para gastos em Combustível</li>
-                      </ul>
+              <TabsContent value="transactions" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Transações</CardTitle>
+                    <CardDescription>
+                      Lista de todas as transações da fatura ({transactionsData?.total || 0} transações)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {transactionsData && (
+                      <TransactionsList
+                        transactions={transactionsData}
+                        onPaginationChange={handlePaginationChange}
+                        onSearchChange={handleSearchChange}
+                        onSortChange={handleSortChange}
+                        onCategoryFilterChange={handleCategoryFilterChange}
+                        sortField={filterParams.sortField}
+                        sortOrder={filterParams.sortOrder}
+                        categoryFilter={filterParams.categoryFilter}
+                        categories={categories}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="analytics" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Resumo por Categoria</CardTitle>
+                    <CardDescription>
+                      Distribuição de gastos por categoria
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {summaryByCategory?.length === 0 ? (
+                        <div className="text-center text-muted-foreground py-8">
+                          Nenhuma categoria disponível
+                        </div>
+                      ) : (
+                        summaryByCategory?.map((category: any) => (
+                          <div key={category.id || 'uncategorized'} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <CategoryIcon
+                                  iconName={category.icon || 'help-circle'}
+                                  color={category.color || 'gray'}
+                                  size={16}
+                                />
+                                <span className="font-medium">{category.name}</span>
+                              </div>
+                              <span className="font-medium">
+                                R$ {category.total.toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary rounded-full"
+                                style={{
+                                  width: `${(category.total / totalAmount) * 100}%`,
+                                  backgroundColor: category.color ? `hsl(var(--${category.color}))` : undefined
+                                }}
+                              />
+                            </div>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>{category.count} transações</span>
+                              <span>{category.points.toLocaleString()} pontos</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-muted-foreground py-8">
-                    Não encontramos oportunidades de melhorias para esta fatura.
-                  </div>
-                )}
-              </CardContent>
-            </Card> */}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-             <TransactionOptimizationsComponent />
+              <TabsContent value="suggestions" className="space-y-4">
+                <SuggestionsSection invoiceId={invoiceId} />
+              </TabsContent>
+            </Tabs>
           </>
         )}
       </Main>
