@@ -122,9 +122,6 @@ export function CardRecommendationsComponent() {
                   <IconTrendingUp size={16} />
                   {card.potential_points_increase} mais pontos
                 </div>
-                <Button variant="outline" size="sm">
-                  Detalhes
-                </Button>
               </div>
             </div>
           ))}

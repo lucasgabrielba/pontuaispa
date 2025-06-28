@@ -6,12 +6,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { useIsAdmin } from '@/hooks/use-is-admin';
 import { suggestionsService, CreateSuggestionData } from '@/services/suggestions-service';
+import { invoicesService } from '@/services/invoices-service';
+import { adminInvoicesService } from '@/services/admin-invoices-service';
 
 interface SuggestionSheetProps {
   invoiceId: string;
   onCreated?: () => void;
   isAdmin?: boolean;
   className?: string;
+}
+
+interface CategorySummary {
+  id: string | null;
+  name: string;
+  icon: string;
+  color: string;
+  total: number;
+  count: number;
+  points: number;
 }
 
 const SUGGESTION_TYPES = [
@@ -34,7 +46,9 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
   
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<CreateSuggestionData>({
+  const [categories, setCategories] = useState<CategorySummary[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [form, setForm] = useState<CreateSuggestionData & { category_id?: string }>({
     title: '',
     description: '',
     type: 'general_tip',
@@ -42,9 +56,7 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
     recommendation: '',
     impact_description: '',
     potential_points_increase: '',
-    is_personalized: false,
-    applies_to_future: false,
-    additional_data: {},
+    category_id: undefined,
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -56,10 +68,6 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
     setForm({ ...form, [name]: value });
   };
 
-  const handleCheckbox = (name: string) => {
-    setForm({ ...form, [name]: !form[name as keyof typeof form] });
-  };
-
   const resetForm = () => {
     setForm({
       title: '',
@@ -69,10 +77,27 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
       recommendation: '',
       impact_description: '',
       potential_points_increase: '',
-      is_personalized: false,
-      applies_to_future: false,
-      additional_data: {},
+      category_id: undefined,
     });
+  };
+
+  const loadCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const response = await invoicesService.getInvoiceCategorySummary(invoiceId);
+      setCategories(response.data);
+    } catch (err) {
+      console.error('Erro ao carregar categorias:', err);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const handleTypeChange = (value: string) => {
+    handleSelect('type', value);
+    if (value === 'category_optimization' && categories.length === 0) {
+      loadCategories();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,14 +106,15 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
     setError(null);
     
     try {
-      const payload: CreateSuggestionData = {
+      const payload: CreateSuggestionData & { category_id?: string } = {
         ...form,
         // Garantir que campos opcionais vazios sejam undefined
         impact_description: form.impact_description || undefined,
         potential_points_increase: form.potential_points_increase || undefined,
+        category_id: form.category_id || undefined,
       };
 
-      await suggestionsService.invoice.create(invoiceId, payload);
+      await adminInvoicesService.createSuggestion(invoiceId, payload);
       
       setOpen(false);
       resetForm();
@@ -101,7 +127,16 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return (amount / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  };
+
   if (!showSheet) return null;
+
+  const showCategorySelect = form.type === 'category_optimization';
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -147,7 +182,7 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
             />
             
             <div className="flex gap-2">
-              <Select value={form.type} onValueChange={v => handleSelect('type', v)}>
+              <Select value={form.type} onValueChange={handleTypeChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
@@ -169,6 +204,35 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
                 </SelectContent>
               </Select>
             </div>
+
+            {showCategorySelect && (
+              <Select 
+                value={form.category_id} 
+                onValueChange={v => handleSelect('category_id', v)}
+                disabled={loadingCategories}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={loadingCategories ? "Carregando categorias..." : "Selecione uma categoria"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem 
+                      key={category.id || 'no-category'} 
+                      value={category.id || 'no-category'}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span>{category.name}</span>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>{formatCurrency(category.total)}</span>
+                          <span>({category.count} transações)</span>
+                          <span>{category.points} pts</span>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             
             <Input
               name="impact_description"
@@ -185,28 +249,6 @@ export function SuggestionSheet({ invoiceId, onCreated, isAdmin = false, classNa
               placeholder="Potencial de pontos a mais (opcional)"
               maxLength={32}
             />
-            
-            <div className="flex gap-4 items-center">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.is_personalized}
-                  onChange={() => handleCheckbox('is_personalized')}
-                  className="accent-primary"
-                />
-                Personalizada
-              </label>
-              
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.applies_to_future}
-                  onChange={() => handleCheckbox('applies_to_future')}
-                  className="accent-primary"
-                />
-                Aplicar para próximas faturas
-              </label>
-            </div>
             
             {error && (
               <div className="text-red-500 text-sm bg-red-50 p-3 rounded-md">

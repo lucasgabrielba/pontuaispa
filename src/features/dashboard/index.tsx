@@ -18,7 +18,6 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { Overview } from './components/overview'
 import { RecentTransactions } from './components/recent-transactions'
 import { PointsStatus } from './components/points-status'
-import { RecommendationsListAI } from './components/recommendations-list'
 import { CreditCard, Upload, Waypoints } from 'lucide-react'
 import { useDashboard } from '@/hooks/use-dashboard'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -27,33 +26,60 @@ import { IconAlertCircle } from '@tabler/icons-react'
 import { useOnboarding } from '@/hooks/use-onboarding'
 import { useEffect, useState } from 'react'
 import { useAnalysis } from '@/hooks/use-analysis'
+import { SuggestionsList } from '../faturas/details/components/suggestions-list'
+import { suggestionsService } from '@/services/suggestions-service'
 
 export default function DashboardWithAI() {
   const navigate = useNavigate()
   const { userHasCards } = useOnboarding()
   const [hasData, setHasData] = useState<boolean | null>(null)
-  
+
+  // Sugestões para o dashboard
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true)
+
+  // Função para buscar sugestões
+  const fetchSuggestions = async () => {
+    setIsLoadingSuggestions(true)
+    try {
+      const response = await suggestionsService.list()
+      setSuggestions(response.data?.suggestions || response.data || [])
+    } catch (error) {
+      setSuggestions([])
+    } finally {
+      setIsLoadingSuggestions(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchSuggestions()
+  }, [])
+
   // Verificar se o usuário tem cartões cadastrados
   useEffect(() => {
     if (userHasCards.isSuccess) {
       setHasData(userHasCards.data || false)
     }
   }, [userHasCards.isSuccess, userHasCards.data])
-  
+
   // Buscar dados do dashboard tradicional
-  const { 
-    stats, 
-    transactions, 
-    pointsPrograms, 
+  const {
+    stats,
+    transactions,
+    pointsPrograms,
     monthlySpent,
   } = useDashboard(hasData !== null ? hasData : true)
-  
+
+  useEffect(() => {
+    suggestionsService.list()
+  }, [])
+
   // Buscar dados do serviço de análise com IA
   const {
     cardsRecommendation,
     pointsSummary
   } = useAnalysis(hasData !== null ? hasData : true)
-  
+
   // Função para formatar valor monetário
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -61,14 +87,14 @@ export default function DashboardWithAI() {
       currency: 'BRL'
     }).format(value);
   }
-  
+
   // Verificar se o usuário tem dados no dashboard
   const isEmpty = !stats.data || (
-    stats.data.totalSpent === 0 && 
-    stats.data.pointsEarned === 0 && 
+    stats.data.totalSpent === 0 &&
+    stats.data.pointsEarned === 0 &&
     stats.data.activeCards === 0
   )
-  
+
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -92,7 +118,7 @@ export default function DashboardWithAI() {
             </Button>
           </div>
         </div>
-        
+
         {isEmpty && !stats.isLoading && (
           <Alert variant="default" className="mb-6">
             <IconAlertCircle className="h-4 w-4" />
@@ -115,7 +141,7 @@ export default function DashboardWithAI() {
               <TabsTrigger value='recommendations'>Recomendações</TabsTrigger>
             </TabsList>
           </div>
-          
+
           <TabsContent value='overview' className='space-y-4'>
             <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
               <Card>
@@ -144,20 +170,20 @@ export default function DashboardWithAI() {
                       {formatCurrency(stats.data?.totalSpent || 0)}
                     </div>
                   )}
-                  
+
                   {stats.isLoading ? (
                     <Skeleton className="h-4 w-36 mt-1" />
                   ) : (
                     <p className='text-xs text-muted-foreground'>
-                      {stats.data?.spentGrowth && stats.data.spentGrowth > 0 
-                        ? `+${stats.data.spentGrowth}% do mês anterior` 
+                      {stats.data?.spentGrowth && stats.data.spentGrowth > 0
+                        ? `+${stats.data.spentGrowth}% do mês anterior`
                         : "Nenhum dado anterior para comparação"}
                     </p>
                   )}
                 </CardContent>
               </Card>
-              
-              <Card>
+
+              {/* <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
                     Pontos Ganhos
@@ -172,7 +198,7 @@ export default function DashboardWithAI() {
                       {stats.data?.pointsEarned?.toLocaleString() || 0}
                     </div>
                   )}
-                  
+
                   {stats.isLoading ? (
                     <Skeleton className="h-4 w-36 mt-1" />
                   ) : (
@@ -181,8 +207,8 @@ export default function DashboardWithAI() {
                     </p>
                   )}
                 </CardContent>
-              </Card>
-              
+              </Card> */}
+
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
@@ -195,24 +221,24 @@ export default function DashboardWithAI() {
                     <Skeleton className="h-8 w-24" />
                   ) : (
                     <div className='text-2xl font-bold'>
-                      {cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0 
+                      {cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0
                         ? `+${cardsRecommendation.data.recommendations[0].potential_points_increase}`
                         : (stats.data?.potentialPoints ? `+${stats.data.potentialPoints}` : 0)}
                     </div>
                   )}
-                  
+
                   {stats.isLoading || cardsRecommendation.isLoading ? (
                     <Skeleton className="h-4 w-36 mt-1" />
                   ) : (
                     <p className='text-xs text-muted-foreground'>
-                      {cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0 
+                      {cardsRecommendation.data?.recommendations && cardsRecommendation.data.recommendations.length > 0
                         ? "Aumento potencial com recomendações"
                         : (stats.data?.potentialPoints ? "+93% de oportunidade" : "Adicione cartões para ver seu potencial")}
                     </p>
                   )}
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
@@ -228,33 +254,33 @@ export default function DashboardWithAI() {
                       {stats.data?.activeCards || 0}
                     </div>
                   )}
-                  
+
                   {stats.isLoading ? (
                     <Skeleton className="h-4 w-36 mt-1" />
                   ) : (
                     <p className='text-xs text-muted-foreground'>
-                      {stats?.data?.activeCards && stats.data?.activeCards > 0 
-                        ? "Nubank e Itaucard" 
+                      {stats?.data?.activeCards && stats.data?.activeCards > 0
+                        ? "Nubank e Itaucard"
                         : "Nenhum cartão cadastrado"}
                     </p>
                   )}
                 </CardContent>
               </Card>
             </div>
-            
+
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-4'>
                 <CardHeader>
                   <CardTitle>Visão Geral de Gastos</CardTitle>
                 </CardHeader>
                 <CardContent className='pl-2'>
-                  <Overview 
-                    data={monthlySpent.data} 
-                    isLoading={monthlySpent.isLoading} 
+                  <Overview
+                    data={monthlySpent.data}
+                    isLoading={monthlySpent.isLoading}
                   />
                 </CardContent>
               </Card>
-              
+
               <Card className='col-span-1 lg:col-span-3'>
                 <CardHeader>
                   <CardTitle>Transações Recentes</CardTitle>
@@ -263,15 +289,15 @@ export default function DashboardWithAI() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentTransactions 
-                    data={transactions?.data} 
-                    isLoading={transactions?.isLoading} 
+                  <RecentTransactions
+                    data={transactions?.data}
+                    isLoading={transactions?.isLoading}
                   />
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value='points' className='space-y-4'>
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
               <Card className='col-span-1'>
@@ -282,13 +308,13 @@ export default function DashboardWithAI() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className='pl-2'>
-                  <PointsStatus 
-                    data={pointsPrograms.data} 
-                    isLoading={pointsPrograms.isLoading || pointsPrograms.isRefetching} 
+                  <PointsStatus
+                    data={pointsPrograms.data}
+                    isLoading={pointsPrograms.isLoading || pointsPrograms.isRefetching}
                   />
                 </CardContent>
               </Card>
-              
+
               <Card className='col-span-1'>
                 <CardHeader>
                   <CardTitle>Pontos a Expirar</CardTitle>
@@ -320,7 +346,7 @@ export default function DashboardWithAI() {
                   )}
                 </CardContent>
               </Card>
-              
+
               <Card className='col-span-1 lg:col-span-2'>
                 <CardHeader>
                   <CardTitle>Recomendações para seus Pontos</CardTitle>
@@ -339,7 +365,7 @@ export default function DashboardWithAI() {
                           {pointsSummary.data.recommendations.message}
                         </AlertDescription>
                       </Alert>
-                      
+
                       {pointsSummary.data.recommendations.suggested_actions && (
                         <ul className="space-y-2">
                           {pointsSummary.data.recommendations.suggested_actions.map((action, index) => (
@@ -360,17 +386,19 @@ export default function DashboardWithAI() {
               </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value='recommendations' className='space-y-4'>
             <Card className='col-span-1'>
               <CardHeader>
-                <CardTitle>Recomendações Personalizadas</CardTitle>
-                <CardDescription>
-                  Como maximizar seus pontos com base nos seus gastos
-                </CardDescription>
+                <CardTitle>Últimas sugestões personalizadas</CardTitle>
               </CardHeader>
               <CardContent>
-                <RecommendationsListAI />
+                <SuggestionsList
+                  suggestions={suggestions}
+                  isLoading={isLoadingSuggestions}
+                  onRefetch={fetchSuggestions}
+                  onCreateNew={() => { }}
+                />
               </CardContent>
             </Card>
           </TabsContent>

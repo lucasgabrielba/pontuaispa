@@ -1,5 +1,4 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { IconBulb } from '@tabler/icons-react';
 import { SuggestionsList } from './suggestions-list';
 import { SuggestionSheet } from './suggestion-sheet';
@@ -14,14 +13,10 @@ export function SuggestionsSection({ invoiceId }: SuggestionsSectionProps) {
   const isAdmin = useIsAdmin();
   const {
     suggestions,
-    stats,
     isLoading,
     error,
     deleteSuggestion,
     refetchAll,
-    hasSuggestions,
-    totalSuggestions,
-    highPrioritySuggestions
   } = useSuggestions({ invoiceId });
 
   const handleSuggestionCreated = () => {
@@ -61,30 +56,17 @@ export function SuggestionsSection({ invoiceId }: SuggestionsSectionProps) {
               Recomendações personalizadas para maximizar seus pontos
             </CardDescription>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            {hasSuggestions && (
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">
-                  {totalSuggestions} sugestão{totalSuggestions !== 1 ? 'ões' : ''}
-                </Badge>
-                {highPrioritySuggestions > 0 && (
-                  <Badge variant="destructive">
-                    {highPrioritySuggestions} prioridade alta
-                  </Badge>
-                )}
-              </div>
-            )}
-            
             {isAdmin && (
-              <SuggestionSheet 
-                invoiceId={invoiceId} 
+              <SuggestionSheet
+                invoiceId={invoiceId}
                 onCreated={handleSuggestionCreated}
               />
             )}
           </div>
         </div>
-        
+
         {/* {stats && hasSuggestions && (
           <div className="flex items-center gap-4 mt-4 p-4 bg-muted rounded-lg">
             <div className="flex items-center gap-2">
@@ -110,9 +92,10 @@ export function SuggestionsSection({ invoiceId }: SuggestionsSectionProps) {
           </div>
         )} */}
       </CardHeader>
-      
+
       <CardContent>
         <SuggestionsList
+          //@ts-expect-error - 234324
           suggestions={suggestions}
           onDelete={isAdmin ? handleSuggestionDeleted : undefined}
           isLoading={isLoading}

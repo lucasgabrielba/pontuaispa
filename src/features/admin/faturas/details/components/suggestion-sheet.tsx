@@ -39,6 +39,7 @@ const suggestionSchema = z.object({
   type: z.enum(['card_recommendation', 'merchant_recommendation', 'category_optimization', 'points_strategy', 'general_tip'], {
     required_error: 'Tipo de sugestão é obrigatório',
   }),
+  category_id: z.string().optional(),
   title: z.string().min(5, 'Título deve ter pelo menos 5 caracteres').max(100, 'Título não pode ter mais de 100 caracteres'),
   description: z.string().min(10, 'Descrição deve ter pelo menos 10 caracteres').max(500, 'Descrição não pode ter mais de 500 caracteres'),
   recommendation: z.string().min(20, 'Recomendação deve ter pelo menos 20 caracteres').max(1000, 'Recomendação não pode ter mais de 1000 caracteres'),
@@ -60,6 +61,17 @@ interface SuggestionSheetProps {
   onSuccess: () => void
 }
 
+interface InvoiceCategory {
+  id: string
+  name: string
+  icon: string
+  color: string
+  total_amount: number
+  total_amount_formatted: string
+  transaction_count: number
+  total_points: number
+}
+
 const suggestionTypes = [
   { value: 'card_recommendation', label: 'Recomendação de Cartão', description: 'Sugerir cartão específico para categoria' },
   { value: 'merchant_recommendation', label: 'Recomendação de Estabelecimento', description: 'Indicar melhores locais para comprar' },
@@ -76,11 +88,15 @@ const priorityLevels = [
 
 export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: SuggestionSheetProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showCategorySelection, setShowCategorySelection] = useState(false)
+  const [invoiceCategories, setInvoiceCategories] = useState<InvoiceCategory[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(false)
 
   const form = useForm<SuggestionFormData>({
     resolver: zodResolver(suggestionSchema),
     defaultValues: {
       type: 'card_recommendation',
+      category_id: '',
       title: '',
       description: '',
       recommendation: '',
@@ -91,6 +107,40 @@ export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: Su
       applies_to_future: false,
     },
   })
+
+  // Load invoice categories when category suggestion is selected
+  const loadInvoiceCategories = async () => {
+    if (loadingCategories) return
+
+    try {
+      setLoadingCategories(true)
+      const response = await adminInvoicesService.getInvoiceCategoriesForSuggestions(invoiceId)
+      setInvoiceCategories(response.data || [])
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao carregar categorias',
+        description: 'Não foi possível carregar as categorias da fatura'
+      })
+    } finally {
+      setLoadingCategories(false)
+    }
+  }
+
+  // Watch for category suggestion selection
+  const handleCategorySuggestionToggle = () => {
+    const newValue = !showCategorySelection
+    setShowCategorySelection(newValue)
+    
+    if (newValue) {
+      loadInvoiceCategories()
+      form.setValue('type', 'category_optimization')
+    } else {
+      form.setValue('category_id', '')
+      form.setValue('type', 'card_recommendation')
+    }
+  }
 
   // Mutação para criar sugestão
   const createSuggestion = useMutation({
@@ -125,6 +175,8 @@ export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: Su
   const handleClose = () => {
     if (!isSubmitting) {
       form.reset()
+      setShowCategorySelection(false)
+      setInvoiceCategories([])
       onOpenChange(false)
     }
   }
@@ -141,34 +193,96 @@ export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: Su
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6">
-            {/* Tipo de Sugestão */}
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Sugestão</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de sugestão" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {suggestionTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{type.label}</span>
-                            <span className="text-xs text-muted-foreground">{type.description}</span>
+            {/* Opção de Sugestão por Categoria */}
+            <div className="flex items-center space-x-2 p-4 border rounded-lg bg-muted/50">
+              <input
+                type="checkbox"
+                id="category-suggestion"
+                checked={showCategorySelection}
+                onChange={handleCategorySuggestionToggle}
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="category-suggestion" className="text-sm font-medium cursor-pointer">
+                Criar sugestão baseada em categoria específica
+              </label>
+            </div>
+
+            {/* Seleção de Categoria (se habilitada) */}
+            {showCategorySelection && (
+              <div className="space-y-4 p-4 border rounded-lg bg-blue-50">
+                <h4 className="font-medium text-blue-900">Selecione uma categoria desta fatura:</h4>
+                {loadingCategories ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="ml-2">Carregando categorias...</span>
+                  </div>
+                ) : invoiceCategories.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto">
+                    {invoiceCategories.map((category) => (
+                      <div
+                        key={category.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          form.watch('category_id') === category.id
+                            ? 'border-blue-500 bg-blue-100'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => form.setValue('category_id', category.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg">{category.icon || '📂'}</span>
+                            <span className="font-medium">{category.name}</span>
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                          <div className="text-right">
+                            <div className="font-bold text-green-600">
+                              {category.total_amount_formatted}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {category.transaction_count} transações
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    Nenhuma categoria encontrada nesta fatura
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Tipo de Sugestão (apenas se não for por categoria) */}
+            {!showCategorySelection && (
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Sugestão</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo de sugestão" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {suggestionTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{type.label}</span>
+                              <span className="text-xs text-muted-foreground">{type.description}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* Título */}
             <FormField
@@ -179,7 +293,10 @@ export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: Su
                   <FormLabel>Título</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="Ex: Use o cartão Nubank para supermercados" 
+                      placeholder={showCategorySelection 
+                        ? "Ex: Otimize seus gastos em supermercados" 
+                        : "Ex: Use o cartão Nubank para supermercados"
+                      } 
                       {...field} 
                     />
                   </FormControl>
@@ -200,7 +317,10 @@ export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: Su
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Breve explicação do contexto da sugestão..."
+                      placeholder={showCategorySelection 
+                        ? "Contextualização sobre os gastos nesta categoria e oportunidades de otimização..."
+                        : "Breve explicação do contexto da sugestão..."
+                      }
                       className="min-h-[80px]"
                       {...field} 
                     />
@@ -222,7 +342,10 @@ export function SuggestionSheet({ open, onOpenChange, invoiceId, onSuccess }: Su
                   <FormLabel>Recomendação</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Detalhe específico do que o usuário deve fazer para otimizar seus pontos..."
+                      placeholder={showCategorySelection 
+                        ? "Detalhe específico de como otimizar gastos nesta categoria para ganhar mais pontos..."
+                        : "Detalhe específico do que o usuário deve fazer para otimizar seus pontos..."
+                      }
                       className="min-h-[120px]"
                       {...field} 
                     />

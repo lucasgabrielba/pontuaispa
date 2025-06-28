@@ -121,6 +121,7 @@ export function AdminInvoiceDetails() {
         const res = await invoicesService.getInvoice(invoiceId);
         return res.data;
       } catch (error) {
+        console.error('Erro ao buscar fatura:', error);
         // Mock para ambiente de desenvolvimento
         return {
           id: invoiceId,

@@ -44,19 +44,4 @@ export const invoicesService = {
 
   listInvoices: () => api.get('/invoices'),
 
-  // Obtém as categorias das transações para uso em filtros
-  listCategories: () => {
-    const categories = [
-      { label: 'Supermercado', value: 'supermercado' },
-      { label: 'Restaurante', value: 'restaurante' },
-      { label: 'Combustível', value: 'combustivel' },
-      { label: 'Transporte', value: 'transporte' },
-      { label: 'Streaming', value: 'streaming' },
-      { label: 'Saúde', value: 'saude' },
-      { label: 'Educação', value: 'educacao' },
-      { label: 'Lazer', value: 'lazer' }
-    ]
-    
-    return Promise.resolve({ data: { data: categories } })
-  }
 }

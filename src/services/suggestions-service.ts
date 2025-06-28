@@ -20,7 +20,7 @@ export interface Suggestion {
   title: string;
   description: string;
   type: string;
-  priority: string;
+  priority: 'low' | 'medium' | 'high';
   recommendation: string;
   impact_description?: string;
   potential_points_increase?: string;

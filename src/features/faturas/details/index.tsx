@@ -354,10 +354,6 @@ export function InvoiceDetails() {
                 <Badge variant={getStatusVariant(transformedInvoice?.status || 'Processando')}>
                   {transformedInvoice?.status || 'Processando'}
                 </Badge>
-                <Button variant="outline" size="sm">
-                  <IconDownload className="mr-2 h-4 w-4" />
-                  Baixar PDF
-                </Button>
                 {isAdmin && (
                   <SuggestionSheet 
                     invoiceId={invoiceId} 

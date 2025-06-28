@@ -138,10 +138,6 @@ export function RecommendationsListAI() {
                 </div>
                 <div className="text-md">{recommendation.recommendation}</div>
               </div>
-              <Button size="sm" className="mt-2 sm:mt-0">
-                Ver detalhes
-                <IconArrowUpRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
           </CardContent>
         </Card>

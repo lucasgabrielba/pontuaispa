@@ -272,10 +272,6 @@ export function SuggestionsList({
                         <Eye className="mr-2 h-4 w-4" />
                         Ver Detalhes
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Editar
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => handleToggleStatus(suggestion.id, suggestion.status)}
