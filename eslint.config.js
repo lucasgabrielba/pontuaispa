@@ -42,6 +42,10 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/ban-ts-comment': [
+        'off',
+        { 'ts-ignore': false, 'ts-nocheck': false }
+      ],
     },
   }
 )

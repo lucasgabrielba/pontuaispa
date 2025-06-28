@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState } from 'react';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -5,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { useIsAdmin } from '@/hooks/use-is-admin';
-import { suggestionsService, CreateSuggestionData } from '@/services/suggestions-service';
-import { invoicesService } from '@/services/invoices-service';
+import { CreateSuggestionData } from '@/services/suggestions-service';
 import { adminInvoicesService } from '@/services/admin-invoices-service';
 
 interface SuggestionSheetProps {

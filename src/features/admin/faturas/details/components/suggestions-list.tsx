@@ -1,4 +1,3 @@
-// src/features/admin/invoices/details/components/suggestions-list.tsx
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
@@ -11,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -27,16 +25,13 @@ import {
 import { 
   MoreHorizontal, 
   Plus, 
-  Edit, 
   Trash2, 
   Eye, 
   TrendingUp,
   CreditCard,
   Store,
   Target,
-  Lightbulb,
-  AlertTriangle
-} from 'lucide-react'
+  Lightbulb} from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { adminInvoicesService } from '@/services/admin-invoices-service'
 import { toast } from '@/hooks/use-toast'
@@ -134,26 +129,6 @@ export function SuggestionsList({
     }
   })
 
-  // Mutação para arquivar/desarquivar sugestão
-  const toggleSuggestionStatus = useMutation({
-    mutationFn: ({ suggestionId, status }: { suggestionId: string, status: 'active' | 'archived' }) =>
-      adminInvoicesService.updateSuggestionStatus(invoiceId, suggestionId, status),
-    onSuccess: () => {
-      toast({
-        title: 'Status atualizado',
-        description: 'O status da sugestão foi atualizado.'
-      })
-      onRefetch()
-    },
-    onError: (error: any) => {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao atualizar status',
-        description: error?.response?.data?.message || 'Não foi possível atualizar o status'
-      })
-    }
-  })
-
   const handleDeleteSuggestion = (suggestionId: string) => {
     setSuggestionToDelete(suggestionId)
     setDeleteDialogOpen(true)
@@ -163,11 +138,6 @@ export function SuggestionsList({
     if (suggestionToDelete) {
       deleteSuggestion.mutate(suggestionToDelete)
     }
-  }
-
-  const handleToggleStatus = (suggestionId: string, currentStatus: 'active' | 'archived') => {
-    const newStatus = currentStatus === 'active' ? 'archived' : 'active'
-    toggleSuggestionStatus.mutate({ suggestionId, status: newStatus })
   }
 
   if (isLoading) {
@@ -271,22 +241,6 @@ export function SuggestionsList({
                       <DropdownMenuItem>
                         <Eye className="mr-2 h-4 w-4" />
                         Ver Detalhes
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => handleToggleStatus(suggestion.id, suggestion.status)}
-                      >
-                        {suggestion.status === 'active' ? (
-                          <>
-                            <AlertTriangle className="mr-2 h-4 w-4" />
-                            Arquivar
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="mr-2 h-4 w-4" />
-                            Reativar
-                          </>
-                        )}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive focus:text-destructive"

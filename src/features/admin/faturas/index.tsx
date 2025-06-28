@@ -62,8 +62,6 @@ export default function AdminInvoicesFeature() {
     userInvoices,
     isLoadingUsers,
     isLoadingInvoices,
-    refetchUsers,
-    refetchUserInvoices
   } = useAdminInvoices({
     userPage,
     invoicePage,
@@ -74,6 +72,7 @@ export default function AdminInvoicesFeature() {
   })
 
   const handleUserSelect = (userId: string, userName: string) => {
+    console.log(userId, userName)
     setSelectedUserId(userId)
     setActiveTab('invoices')
     setInvoicePage(1) // Reset pagination when selecting new user

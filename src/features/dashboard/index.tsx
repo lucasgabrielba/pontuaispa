@@ -45,6 +45,7 @@ export default function DashboardWithAI() {
       const response = await suggestionsService.list()
       setSuggestions(response.data?.suggestions || response.data || [])
     } catch (error) {
+      console.log(error)
       setSuggestions([])
     } finally {
       setIsLoadingSuggestions(false)
