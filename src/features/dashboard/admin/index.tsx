@@ -16,7 +16,6 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { 
   Users, 
   FileText, 
-  Download
 } from 'lucide-react'
 import { useAdminDashboard } from '@/hooks/use-admin-dashboard'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -41,10 +40,6 @@ export default function AdminDashboard() {
         <TopNav links={adminTopNav} />
         <div className='ml-auto flex flex-wrap items-center gap-2 sm:gap-4'>
           <Search />
-          <Button variant="outline" size="sm" className="hidden lg:block">
-            <Download className="mr-2 h-4 w-4" />
-            Relatório
-          </Button>
           <ThemeSwitch />
           <ProfileDropdown />
         </div>

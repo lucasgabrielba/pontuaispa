@@ -343,10 +343,6 @@ export function AdminInvoiceDetails() {
                   <IconPlus className="mr-2 h-4 w-4" />
                   Nova Sugestão
                 </Button>
-                <Button variant="outline" size="sm">
-                  <IconDownload className="mr-2 h-4 w-4" />
-                  Relatório
-                </Button>
               </div>
             </div>
 

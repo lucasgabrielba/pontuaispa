@@ -47,12 +47,12 @@ export function ProfileDropdown() {
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to='/configuracoes'>
-              Assinatura
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-            </Link>
-          </DropdownMenuItem>
+            {/* <DropdownMenuItem asChild>
+              <Link to='/configuracoes'>
+                Assinatura
+                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem> */}
           <DropdownMenuItem asChild>
             <Link to='/configuracoes'>
               Configurações
