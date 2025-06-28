@@ -47,7 +47,7 @@ const apiClient = {
   put: (url: string, data = {}, config = {}) => api.put(`${apiPrefix}${url}`, data, config),
   patch: (url: string, data = {}, config = {}) => api.patch(`${apiPrefix}${url}`, data, config),
   delete: (url: string, config = {}) => api.delete(`${apiPrefix}${url}`, config),
-  
+
   // Métodos especiais para Sanctum
   csrf: () => api.get('/sanctum/csrf-cookie'),
   baseUrl: baseURL

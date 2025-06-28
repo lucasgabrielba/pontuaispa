@@ -18,7 +18,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { Overview } from './components/overview'
 import { RecentTransactions } from './components/recent-transactions'
 import { PointsStatus } from './components/points-status'
-import { CreditCard, Upload, Waypoints } from 'lucide-react'
+import { CreditCard, Upload } from 'lucide-react'
 import { useDashboard } from '@/hooks/use-dashboard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -77,7 +77,6 @@ export default function DashboardWithAI() {
 
   // Buscar dados do serviço de análise com IA
   const {
-    cardsRecommendation,
     pointsSummary
   } = useAnalysis(hasData !== null ? hasData : true)
 
@@ -210,7 +209,7 @@ export default function DashboardWithAI() {
                 </CardContent>
               </Card> */}
 
-              <Card>
+              {/* <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
                     Potencial de Pontos
@@ -238,7 +237,7 @@ export default function DashboardWithAI() {
                     </p>
                   )}
                 </CardContent>
-              </Card>
+              </Card> */}
 
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>

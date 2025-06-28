@@ -1,8 +1,8 @@
-import { HTMLAttributes, useEffect } from 'react'
+import { HTMLAttributes } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,7 +16,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 import { useAuth } from '@/hooks/use-auth'
-import { useOnboarding } from '@/hooks/use-onboarding'
 
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
@@ -37,14 +36,7 @@ const formSchema = z.object({
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { login } = useAuth()
-  const navigate = useNavigate()
-  const { userHasCards } = useOnboarding()
 
-  // Pre-carrega os cartões para o estado inicial
-  useEffect(() => {
-    userHasCards.refetch()
-  }, [])
-  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,22 +46,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   })
 
   function onSubmit(data: z.infer<typeof formSchema>) {
-    login.mutate(data, {
-      onSuccess: async () => {
-        try {
-          await userHasCards.refetch()
-
-          if (userHasCards.data) {
-            navigate({ to: '/' })
-          } else {
-            navigate({ to: '/onboarding' })
-          }
-        } catch (error) {
-          console.error("Erro ao verificar cartões do usuário:", error)
-          navigate({ to: '/' }) // Redirecionar para o dashboard em caso de erro
-        }
-      }
-    })
+    login.mutate(data)
   }
 
   return (
@@ -120,4 +97,3 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     </div>
   )
 }
-

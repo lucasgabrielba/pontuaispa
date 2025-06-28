@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { authService } from '@/services/auth-service'
+import { onboardingService } from '@/services/onboarding-service'
 import { useAuthStore } from '@/stores/authStore'
 import { toast } from '@/hooks/use-toast'
 import { User } from '@/types/users'
@@ -8,9 +9,9 @@ import { User } from '@/types/users'
 export const useAuth = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { setUser, setAccessToken, reset } = useAuthStore(state => state.auth)
+  const { setUser, setAccessToken, reset, accessToken } = useAuthStore(state => state.auth)
 
-  // Buscar usuário autenticado
+  // Buscar usuário autenticado - só executa se tiver token
   const user = useQuery({
     queryKey: ['auth-user'],
     queryFn: async () => {
@@ -21,7 +22,9 @@ export const useAuth = () => {
       return response.data
     },
     retry: false,
-    enabled: true // Executar automaticamente
+    enabled: !!accessToken, // Só executa se tiver token
+    staleTime: 1000 * 60 * 5, // Cache por 5 minutos
+    refetchOnWindowFocus: false
   }) as UseQueryResult<User>
 
   // Login
@@ -46,19 +49,31 @@ export const useAuth = () => {
         description: 'Bem-vindo de volta!'
       })
 
-      // Redirecionamento inteligente pós-login
-      const user = queryClient.getQueryData(['auth-user'])
+      // Verificar se é admin primeiro
+      const user = queryClient.getQueryData(['auth-user']) as User
       let isAdmin = false
-      // @ts-ignore
+      
       if (user && Array.isArray(user.roles)) {
-        // @ts-ignore
         isAdmin = user.roles.some((role: any) => role.name === 'admin' || role.name === 'super_admin')
       }
 
       if (isAdmin) {
         navigate({ to: '/admin' })
-      } else {
-        navigate({ to: '/' }) 
+        return
+      }
+
+      // Para usuários normais, verificar onboarding
+      try {
+        const hasCardsResponse = await onboardingService.checkUserHasCards()
+        
+        if (hasCardsResponse.data) {
+          navigate({ to: '/' })
+        } else {
+          navigate({ to: '/onboarding' })
+        }
+      } catch (error) {
+        console.error('Erro ao verificar cartões:', error)
+        navigate({ to: '/' })
       }
     },
     onError: (error: any) => {
@@ -96,7 +111,8 @@ export const useAuth = () => {
         description: 'Sua conta foi criada com sucesso!'
       })
 
-      navigate({ to: '/' })
+      // Após registro, sempre vai para onboarding
+      navigate({ to: '/onboarding' })
     },
     onError: (error: any) => {
       console.error('Erro ao registrar:', error)
@@ -118,8 +134,8 @@ export const useAuth = () => {
       // Limpar o estado de autenticação
       reset()
 
-      // Limpar queries que dependem de autenticação
-      queryClient.invalidateQueries()
+      // Limpar todas as queries
+      queryClient.clear()
 
       toast({
         title: 'Logout realizado com sucesso',
@@ -132,6 +148,7 @@ export const useAuth = () => {
       console.error('Erro ao fazer logout:', error)
       // Em caso de erro, limpar localmente de qualquer forma
       reset()
+      queryClient.clear()
       navigate({ to: '/sign-in' })
     }
   })

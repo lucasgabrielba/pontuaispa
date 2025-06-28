@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { onboardingService } from '@/services/onboarding-service'
 import { toast } from '@/hooks/use-toast'
+import { useAuthStore } from '@/stores/authStore'
 
 interface CardCreateRequest {
   name: string;
@@ -50,6 +51,10 @@ export const useOnboarding = (): UseOnboardingReturn => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [cardId, setCardId] = useState<string | null>(null)
+  const { user, accessToken } = useAuthStore(state => state.auth)
+
+  // Só executa se estiver autenticado
+  const isAuthenticated = !!accessToken && !!user
 
   const userHasCards = useQuery<boolean, Error>({
     queryKey: ['user-has-cards'],
@@ -61,10 +66,11 @@ export const useOnboarding = (): UseOnboardingReturn => {
         console.error('Erro ao verificar cartões:', error)
         return false
       }
-    }
+    },
+    enabled: isAuthenticated,
+    retry: false
   })
   
-  // Verificar se o usuário tem cartões
   const userCards = useQuery<UserCardsResponse, Error>({
     queryKey: ['user-cards'],
     queryFn: async () => {
@@ -73,12 +79,13 @@ export const useOnboarding = (): UseOnboardingReturn => {
         return response.data
       } catch (error) {
         console.error('Erro ao verificar cartões:', error)
-        return { cards: [] }
+        return { data: [] }
       }
-    }
+    },
+    enabled: isAuthenticated,
+    retry: false
   })
   
-  // Obter programas de recompensas
   const rewardPrograms = useQuery<any[], Error>({
     queryKey: ['reward-programs'],
     queryFn: async () => {
@@ -89,16 +96,18 @@ export const useOnboarding = (): UseOnboardingReturn => {
         console.error('Erro ao obter programas de recompensas:', error)
         return []
       }
-    }
+    },
+    enabled: isAuthenticated,
+    retry: false
   })
   
-  // Mutação para criar cartão
   const createCard = useMutation<CardCreateResponse, Error, CardCreateRequest>({
     mutationFn: async (data: CardCreateRequest) => {
       return onboardingService.createCard(data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-cards'] })
+      queryClient.invalidateQueries({ queryKey: ['user-has-cards'] })
       
       toast({
         title: 'Cartão criado com sucesso',
@@ -115,13 +124,14 @@ export const useOnboarding = (): UseOnboardingReturn => {
     }
   })
   
-  // Mutação para upload de fatura
   const uploadInvoice = useMutation<any, Error, InvoiceUploadRequest>({
     mutationFn: async (data: InvoiceUploadRequest) => {
       return onboardingService.uploadInvoice(data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-cards'] })
+      queryClient.invalidateQueries({ queryKey: ['user-has-cards'] })
+      
       toast({
         title: 'Fatura enviada com sucesso',
         description: 'Sua fatura está sendo processada'
@@ -137,8 +147,12 @@ export const useOnboarding = (): UseOnboardingReturn => {
     }
   })
   
-  // Função para verificar necessidade de onboarding
   const checkNeedsOnboarding = (): boolean => {
+    if (!isAuthenticated) {
+      navigate({ to: '/sign-in' })
+      return true
+    }
+    
     if (!userCards.data || !userCards.data.data || userCards.data.data.length === 0) {
       navigate({ to: '/onboarding' })
       return true
